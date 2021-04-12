@@ -1,4 +1,4 @@
-export const JCHENTokensAbi = [
+export const CHENDollasAbi = [
   {
     "inputs": [],
     "stateMutability": "nonpayable",

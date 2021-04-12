@@ -6,8 +6,8 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract JCHENTokens is ERC20, ERC20Burnable, Pausable, Ownable {
-    constructor() ERC20("JCHEN Tokens", "JCHEN") {
+contract CHENDollas is ERC20, ERC20Burnable, Pausable, Ownable {
+    constructor() ERC20("CHEN Dollas", "CHEN") {
         _mint(msg.sender, 5000 * 10 ** decimals());
     }
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Web3 from 'web3';
-import { JCHENTokensAbi } from './abis';
+import { CHENDollasAbi } from './abis';
 import classNames from 'classnames';
 import './App.css';
 import './success.css';
@@ -8,8 +8,8 @@ import './success.css';
 const web3 = new Web3(Web3.givenProvider);
 const BN = web3.utils.BN;
 
-const JCHENTokensAddr = '0x1351a8dB5Dbb53b24ceA6E5B138E90B2006a5145';
-const JCHENTokensContract = new web3.eth.Contract(JCHENTokensAbi, JCHENTokensAddr);
+const CHENDollasAddr = '0x20970c2E370DaFbB7d68Ec39daA76Ae876787e84';
+const CHENDollasContract = new web3.eth.Contract(CHENDollasAbi, CHENDollasAddr);
 
 function round(value) {
   return Number(Math.round(value+'e'+2)+'e-'+2);
@@ -49,10 +49,10 @@ function App() {
   const updatePage = async (localAccount) => {
     try {
       const account = localAccount ?? accountAddress;
-      const currentBalance = await JCHENTokensContract.methods.balanceOf(account).call();
+      const currentBalance = await CHENDollasContract.methods.balanceOf(account).call();
       setCurrentBalance(round(currentBalance / (10 ** decimals)));
 
-      const totalSupply = await JCHENTokensContract.methods.totalSupply().call();
+      const totalSupply = await CHENDollasContract.methods.totalSupply().call();
       setTokenSupply(round(totalSupply / (10 ** decimals)));
     } catch (e) {
       setErrorMsg(e.message);
@@ -62,7 +62,7 @@ function App() {
   const handleConnect = async (e) => {
     try {
       const account = await getAccount();
-      setDecimals(await JCHENTokensContract.methods.decimals().call());
+      setDecimals(await CHENDollasContract.methods.decimals().call());
       // pass in account address as it's available in state yet
       await updatePage(account);
     } catch (e) {
@@ -74,8 +74,8 @@ function App() {
     e.preventDefault();
     try {
       const convertedBurnNumber = new BN(burnNumber).mul(new BN((10 ** decimals).toString()));
-      const gas = await JCHENTokensContract.methods.burn(convertedBurnNumber).estimateGas();
-      const result = await JCHENTokensContract.methods.burn(convertedBurnNumber).send({
+      const gas = await CHENDollasContract.methods.burn(convertedBurnNumber).estimateGas();
+      const result = await CHENDollasContract.methods.burn(convertedBurnNumber).send({
         from: accountAddress,
         gas
       });
@@ -94,8 +94,8 @@ function App() {
     e.preventDefault();
     try {
       const convertedMintNumber = new BN(mintNumber).mul(new BN((10 ** decimals).toString()));
-      const gas = await JCHENTokensContract.methods.mint(accountAddress, convertedMintNumber.toString()).estimateGas();
-      const result = await JCHENTokensContract.methods.mint(accountAddress, convertedMintNumber.toString()).send({
+      const gas = await CHENDollasContract.methods.mint(accountAddress, convertedMintNumber.toString()).estimateGas();
+      const result = await CHENDollasContract.methods.mint(accountAddress, convertedMintNumber.toString()).send({
         from: accountAddress,
         gas
       });
@@ -113,8 +113,8 @@ function App() {
     e.preventDefault();
     try {
       const convertedTransferAmount = new BN(transferAmount).mul(new BN((10 ** decimals).toString()));
-      const gas = await JCHENTokensContract.methods.transfer(transferAddress, convertedTransferAmount.toString()).estimateGas();
-      const result = await JCHENTokensContract.methods.transfer(transferAddress, convertedTransferAmount.toString()).send({
+      const gas = await CHENDollasContract.methods.transfer(transferAddress, convertedTransferAmount.toString()).estimateGas();
+      const result = await CHENDollasContract.methods.transfer(transferAddress, convertedTransferAmount.toString()).send({
         from: accountAddress,
         gas,
       });
@@ -148,7 +148,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Bank of $JCHEN</h1>
+        <h1>Bank of 陈CHEN</h1>
         <button
           onClick={handleConnect}
           type="Button">
@@ -209,10 +209,10 @@ function App() {
         <span className="error_msg">{errorMsg}</span>
         <br />
         <br />
-        My Balance: { getCurrentBalance.toLocaleString() } $JCHEN
+        My Balance: { getCurrentBalance.toLocaleString() } 陈CHEN
         <br />
         <br />
-        Total Token Supply: { getTokenSupply.toLocaleString() } $JCHEN
+        Total Token Supply: { getTokenSupply.toLocaleString() } 陈CHEN
       </header>
       <div
         className={classNames({
