@@ -38,11 +38,15 @@
 }
 
 .address_label {
-  margin-right: 10px;
+  margin-right: 12px;
 }
 
 .error_msg {
   color: red;
   width: 80%;
   font-size: small;
+}
+
+input {
+  margin-left: 4px;
 }

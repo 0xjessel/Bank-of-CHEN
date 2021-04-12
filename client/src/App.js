@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import Web3 from 'web3';
 import { JCHENTokensAbi } from './abis';
+import classNames from 'classnames';
 import './App.css';
+import './success.css';
 
 const web3 = new Web3(Web3.givenProvider);
 const BN = web3.utils.BN;
@@ -25,6 +27,11 @@ function App() {
   const [getCurrentBalance, setCurrentBalance] = useState(0);
 
   const [errorMsg, setErrorMsg] = useState();
+
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [svgClassname, setSvgClassname] = useState();
+  const [circleClassname, setCircleClassname] = useState();
+  const [pathClassname, setPathClassname] = useState();
 
   const getAccount = async () => {
     const ethereum = window.ethereum;
@@ -68,10 +75,14 @@ function App() {
     try {
       const convertedBurnNumber = new BN(burnNumber).mul(new BN((10 ** decimals).toString()));
       const gas = await JCHENTokensContract.methods.burn(convertedBurnNumber).estimateGas();
-      await JCHENTokensContract.methods.burn(convertedBurnNumber).send({
+      const result = await JCHENTokensContract.methods.burn(convertedBurnNumber).send({
         from: accountAddress,
         gas
       });
+
+      if (result.status) {
+        showSuccessPopup();
+      }
     } catch (e) {
       setErrorMsg(e.message);
     }
@@ -84,10 +95,13 @@ function App() {
     try {
       const convertedMintNumber = new BN(mintNumber).mul(new BN((10 ** decimals).toString()));
       const gas = await JCHENTokensContract.methods.mint(accountAddress, convertedMintNumber.toString()).estimateGas();
-      await JCHENTokensContract.methods.mint(accountAddress, convertedMintNumber.toString()).send({
+      const result = await JCHENTokensContract.methods.mint(accountAddress, convertedMintNumber.toString()).send({
         from: accountAddress,
         gas
       });
+      if (result.status) {
+        showSuccessPopup();
+      }
     } catch (e) {
       setErrorMsg(e.message);
     }
@@ -100,15 +114,35 @@ function App() {
     try {
       const convertedTransferAmount = new BN(transferAmount).mul(new BN((10 ** decimals).toString()));
       const gas = await JCHENTokensContract.methods.transfer(transferAddress, convertedTransferAmount.toString()).estimateGas();
-      await JCHENTokensContract.methods.transfer(transferAddress, convertedTransferAmount.toString()).send({
+      const result = await JCHENTokensContract.methods.transfer(transferAddress, convertedTransferAmount.toString()).send({
         from: accountAddress,
         gas,
       });
+
+      if (result.status) {
+        showSuccessPopup();
+      }
     } catch (e) {
       setErrorMsg(e.message);
     }
 
     await updatePage();
+  }
+
+  function showSuccessPopup() {
+    setShowSuccess(true);
+    setSvgClassname('checkmark');
+    setCircleClassname('checkmark__circle');
+    setPathClassname('checkmark__check');
+  }
+
+  const onSuccessAnimationEnd = () => {
+    setShowSuccess(false);
+
+    // reset animation
+    setSvgClassname('');
+    setCircleClassname('');
+    setPathClassname('');
   }
 
   return (
@@ -180,6 +214,30 @@ function App() {
         <br />
         Total Token Supply: { getTokenSupply } $JCHEN
       </header>
+      <div
+        className={classNames({
+          success_dialog: true,
+          hidden: !showSuccess,
+        })}>
+        <svg
+          className={svgClassname}
+          xmlns="checkmark"
+          viewBox="0 0 52 52">
+          <circle
+            className={circleClassname}
+            cx="26"
+            cy="26"
+            r="25"
+            fill="none"
+          />
+          <path
+            className={pathClassname}
+            fill="none"
+            d="M14.1 27.2l7.1 7.2 16.7-16.8"
+            onAnimationEnd={onSuccessAnimationEnd}
+          />
+        </svg>
+      </div>
     </div>
   );
 
