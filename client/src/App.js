@@ -209,10 +209,10 @@ function App() {
         <span className="error_msg">{errorMsg}</span>
         <br />
         <br />
-        My Balance: { getCurrentBalance } $JCHEN
+        My Balance: { getCurrentBalance.toLocaleString() } $JCHEN
         <br />
         <br />
-        Total Token Supply: { getTokenSupply } $JCHEN
+        Total Token Supply: { getTokenSupply.toLocaleString() } $JCHEN
       </header>
       <div
         className={classNames({
