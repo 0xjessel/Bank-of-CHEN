@@ -8,7 +8,7 @@ import './success.css';
 const web3 = new Web3(Web3.givenProvider);
 const BN = web3.utils.BN;
 
-const CHENDollasAddr = '0x20970c2E370DaFbB7d68Ec39daA76Ae876787e84';
+const CHENDollasAddr = '0x8e6124829e9b1E83bA6f3A1C7Be8435D9Bc4bb46';
 const CHENDollasContract = new web3.eth.Contract(CHENDollasAbi, CHENDollasAddr);
 
 function round(value) {
