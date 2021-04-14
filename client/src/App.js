@@ -50,10 +50,10 @@ function App() {
     try {
       const account = localAccount ?? accountAddress;
       const currentBalance = await CHENDollasContract.methods.balanceOf(account).call();
-      setCurrentBalance(round(currentBalance / (10 ** decimals)));
+      setCurrentBalance(currentBalance / (10 ** decimals));
 
       const totalSupply = await CHENDollasContract.methods.totalSupply().call();
-      setTokenSupply(round(totalSupply / (10 ** decimals)));
+      setTokenSupply(totalSupply / (10 ** decimals));
     } catch (e) {
       setErrorMsg(e.message);
     }
@@ -209,10 +209,10 @@ function App() {
         <span className="error_msg">{errorMsg}</span>
         <br />
         <br />
-        My Balance: { getCurrentBalance.toLocaleString() } 陈CHEN
+        My Balance: { round(getCurrentBalance).toLocaleString() } 陈CHEN
         <br />
         <br />
-        Total Token Supply: { getTokenSupply.toLocaleString() } 陈CHEN
+        Total Token Supply: { round(getTokenSupply).toLocaleString() } 陈CHEN
       </header>
       <div
         className={classNames({
