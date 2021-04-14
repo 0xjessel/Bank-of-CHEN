@@ -8,12 +8,8 @@ import './success.css';
 const web3 = new Web3(Web3.givenProvider);
 const BN = web3.utils.BN;
 
-const CHENDollasAddr = '0x8e6124829e9b1E83bA6f3A1C7Be8435D9Bc4bb46';
+const CHENDollasAddr = '0x2E328259bb43a207D12218154055f5655719D237';
 const CHENDollasContract = new web3.eth.Contract(CHENDollasAbi, CHENDollasAddr);
-
-function round(value) {
-  return Number(Math.round(value+'e'+2)+'e-'+2);
-}
 
 function App() {
   const [accountAddress, setAccountAddress] = useState('0x0');
@@ -68,6 +64,24 @@ function App() {
     } catch (e) {
       setErrorMsg(e.message);
     }
+  }
+
+  const handleDrip = async (e) => {
+    try {
+      const gas = await CHENDollasContract.methods.drip().estimateGas();
+      const result = await CHENDollasContract.methods.drip().send({
+        from: accountAddress,
+        gas
+      });
+
+      if (result.status) {
+        showSuccessPopup();
+      }
+    } catch {
+      setErrorMsg(e.message);
+    }
+
+    await updatePage();
   }
 
   const handleBurn = async (e) => {
@@ -158,6 +172,12 @@ function App() {
         My address: { accountAddress }
         <br />
         <br />
+        <button
+          className="drip_button"
+          onClick={handleDrip}
+          type="Button">
+          Drip
+        </button>
         <br />
         <form onSubmit={handleMint}>
           <label>
@@ -209,10 +229,10 @@ function App() {
         <span className="error_msg">{errorMsg}</span>
         <br />
         <br />
-        My Balance: { round(getCurrentBalance).toLocaleString() } 陈CHEN
+        My Balance: { getCurrentBalance.toLocaleString() } 陈CHEN
         <br />
         <br />
-        Total Token Supply: { round(getTokenSupply).toLocaleString() } 陈CHEN
+        Total Token Supply: { getTokenSupply.toLocaleString() } 陈CHEN
       </header>
       <div
         className={classNames({
