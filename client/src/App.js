@@ -46,7 +46,10 @@ function App() {
   const [circleClassname, setCircleClassname] = useState();
   const [pathClassname, setPathClassname] = useState();
 
-  useEffect(() => {
+  useEffect(async () => {
+    const totalSupply = await CHENDollasContract.methods.totalSupply().call();
+    setTokenSupply(totalSupply / (10 ** decimals));
+
     CHENDollasContract.events.Drip({
       fromBlock: 0,
     }).on('data', async (event) => {
@@ -88,9 +91,6 @@ function App() {
       const account = localAccount ?? accountAddress;
       const currentBalance = await CHENDollasContract.methods.balanceOf(account).call();
       setCurrentBalance(currentBalance / (10 ** decimals));
-
-      const totalSupply = await CHENDollasContract.methods.totalSupply().call();
-      setTokenSupply(totalSupply / (10 ** decimals));
     } catch (e) {
       setErrorMsg(e.message);
     }
