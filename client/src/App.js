@@ -24,7 +24,7 @@ import TextField from '@material-ui/core/TextField';
 const web3 = new Web3(Web3.givenProvider);
 const BN = web3.utils.BN;
 
-const CHENDollasAddr = '0x2E328259bb43a207D12218154055f5655719D237';
+const CHENDollasAddr = '0xd36f4FE394829CE309C0907C13A7c3A1233AF013';
 const CHENDollasContract = new web3.eth.Contract(CHENDollasAbi, CHENDollasAddr);
 
 function App() {
@@ -68,7 +68,7 @@ function App() {
 
       setDripRows(dripRows => [row, ...dripRows]);
     });
-  }, [decimals]);
+  }, []);
 
   const getAccount = async () => {
     const ethereum = window.ethereum;
@@ -110,7 +110,7 @@ function App() {
 
   const handleDrip = async (e) => {
     try {
-      const gas = await CHENDollasContract.methods.drip().estimateGas();
+      const gas = await CHENDollasContract.methods.drip().estimateGas({from: accountAddress});
       const result = await CHENDollasContract.methods.drip().send({
         from: accountAddress,
         gas
@@ -119,7 +119,7 @@ function App() {
       if (result.status) {
         showSuccessPopup();
       }
-    } catch {
+    } catch (e) {
       setErrorMsg(e.message);
     }
 

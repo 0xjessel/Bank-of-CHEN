@@ -8,12 +8,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract CHENDollas is ERC20, ERC20Burnable, Pausable, Ownable {
   uint _dripAmount;
+  uint _dripThreshold;
 
   event Drip(address indexed to, uint amount);
 
   constructor() ERC20("CHEN Dollas", "CHEN") {
-    _mint(msg.sender, 5000 * 10 ** decimals());
+    _mint(msg.sender, 50000 * 10 ** decimals());
     _dripAmount = 1000 * 10 ** decimals();
+    _dripThreshold = 5000 * 10 ** decimals();
   }
 
   function pause() public onlyOwner {
@@ -37,6 +39,8 @@ contract CHENDollas is ERC20, ERC20Burnable, Pausable, Ownable {
   }
 
   function drip() public whenNotPaused {
+    require(balanceOf(msg.sender) < _dripThreshold, "Account already has enough");
+
     _mint(msg.sender, _dripAmount);
     emit Drip(msg.sender, _dripAmount);
   }
