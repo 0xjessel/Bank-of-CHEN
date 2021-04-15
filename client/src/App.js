@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
-import { CHENDollasAbi } from './abis';
+import Table from "@material-ui/core/Table";
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
 import classNames from 'classnames';
+import { CHENDollasAbi } from './abis';
+
 import './App.css';
 import './success.css';
 
@@ -21,6 +29,7 @@ function App() {
   const [transferAmount, setTransferAmount] = useState(0);
   const [getTokenSupply, setTokenSupply] = useState(0);
   const [getCurrentBalance, setCurrentBalance] = useState(0);
+  const [getDripRows, setDripRows] = useState([]);
 
   const [errorMsg, setErrorMsg] = useState();
 
@@ -28,6 +37,31 @@ function App() {
   const [svgClassname, setSvgClassname] = useState();
   const [circleClassname, setCircleClassname] = useState();
   const [pathClassname, setPathClassname] = useState();
+
+  useEffect(() => {
+    CHENDollasContract.events.Drip({
+      fromBlock: 0,
+    }).on('data', async (event) => {
+      let {
+        blockHash,
+        returnValues,
+        transactionHash,
+      } = event;
+      const to = returnValues.to;
+      const amount = returnValues.amount / (10 ** decimals);
+      const timestamp = (await web3.eth.getBlock(blockHash)).timestamp * 1000;
+
+      const row = {
+        to,
+        amount,
+        transactionHash,
+        timestamp,
+      };
+
+      setDripRows(dripRows => [row, ...dripRows]);
+    });
+    console.log('effect');
+  }, []);
 
   const getAccount = async () => {
     const ethereum = window.ethereum;
@@ -59,6 +93,7 @@ function App() {
     try {
       const account = await getAccount();
       setDecimals(await CHENDollasContract.methods.decimals().call());
+
       // pass in account address as it's available in state yet
       await updatePage(account);
     } catch (e) {
@@ -161,79 +196,75 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>Bank of 陈CHEN</h1>
-        <button
-          onClick={handleConnect}
-          type="Button">
-          Connect Wallet
-        </button>
-        <br />
+      <h1>Bank of 陈CHEN</h1>
+      <button
+        className="connect_wallet"
+        onClick={handleConnect}
+        type="Button">
+        Connect Wallet
+      </button>
+      <span className="account_address">
         My address: { accountAddress }
-        <br />
-        <br />
-        <button
-          className="drip_button"
-          onClick={handleDrip}
-          type="Button">
-          Drip
-        </button>
-        <br />
-        <form onSubmit={handleMint}>
-          <label>
-            Mint New Tokens:
-            <input
-              type="text"
-              name="name"
-              value={mintNumber}
-              onChange={ e => setMintNumber(e.target.value) }
-            />
-          </label>
-          <input type="submit" value="Mint" />
-        </form>
-        <form onSubmit={handleBurn}>
-          <label>
-            Burn Tokens:
-            <input
-              type="text"
-              name="name"
-              value={burnNumber}
-              onChange={ e => setBurnNumber(e.target.value) }
-            />
-          </label>
-          <input type="submit" value="Burn" />
-        </form>
-        <br />
-        <form onSubmit={handleTransfer}>
-          <label className="address_label">
-            Transfer Address:
-            <input
-              type="text"
-              name="name"
-              value={transferAddress}
-              onChange={ e => setTransferAddress(e.target.value) }
-            />
-          </label>
-          <label>
-            Amount:
-            <input
-              type="text"
-              name="name"
-              value={transferAmount}
-              onChange={ e => setTransferAmount(e.target.value) }
-            />
-          </label>
-          <input type="submit" value="Transfer Now" />
-        </form>
-        <br />
-        <span className="error_msg">{errorMsg}</span>
-        <br />
-        <br />
+      </span>
+      <button
+        className="drip_button"
+        onClick={handleDrip}
+        type="Button">
+        Drip
+      </button>
+      <form className="mint_form" onSubmit={handleMint}>
+        <label>
+          Mint New Tokens:
+          <input
+            type="text"
+            name="name"
+            value={mintNumber}
+            onChange={ e => setMintNumber(e.target.value) }
+          />
+        </label>
+        <input type="submit" value="Mint" />
+      </form>
+      <form className="burn_form" onSubmit={handleBurn}>
+        <label>
+          Burn Tokens:
+          <input
+            type="text"
+            name="name"
+            value={burnNumber}
+            onChange={ e => setBurnNumber(e.target.value) }
+          />
+        </label>
+        <input type="submit" value="Burn" />
+      </form>
+      <form className="transfer_form" onSubmit={handleTransfer}>
+        <label className="address_label">
+          Transfer Address:
+          <input
+            type="text"
+            name="name"
+            value={transferAddress}
+            onChange={ e => setTransferAddress(e.target.value) }
+          />
+        </label>
+        <label>
+          Amount:
+          <input
+            type="text"
+            name="name"
+            value={transferAmount}
+            onChange={ e => setTransferAmount(e.target.value) }
+          />
+        </label>
+        <input type="submit" value="Transfer Now" />
+      </form>
+      <span className="error_msg">{errorMsg}</span>
+      <span className="my_balance">
         My Balance: { getCurrentBalance.toLocaleString() } 陈CHEN
-        <br />
-        <br />
+      </span>
+      <span className="total_supply">
         Total Token Supply: { getTokenSupply.toLocaleString() } 陈CHEN
-      </header>
+      </span>
+      {dripTable()}
       <div
         className={classNames({
           success_dialog: true,
@@ -261,6 +292,38 @@ function App() {
     </div>
   );
 
+  function dripTable() {
+    return (
+      <TableContainer className="drip_table" component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell align="left">Address</TableCell>
+              <TableCell align="right">Amount</TableCell>
+              <TableCell align="right">Date</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {getDripRows.map((row) => (
+              <TableRow key={row.transactionHash}>
+                <TableCell component="th" scope="row">
+                  <a
+                    href={'https://ropsten.etherscan.io/address/'+row.to}
+                    target="_blank">
+                    {row.to}
+                  </a>
+                </TableCell>
+                <TableCell align="right">{row.amount}</TableCell>
+                <TableCell align="right">
+                  {new Date(row.timestamp).toLocaleString()}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  }
 }
 
 export default App;

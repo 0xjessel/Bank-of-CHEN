@@ -1,5 +1,25 @@
 .App {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(8px + 2vmin);
+  color: white;
   text-align: center;
+}
+
+.connect_wallet, .account_address {
+  margin-bottom: 12px;
+}
+
+.mint_form, .burn_form, .transfer_form {
+  margin-bottom: 4px;
+}
+
+.my_balance {
+  margin: 12px 0;
 }
 
 .App-logo {
@@ -11,17 +31,6 @@
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
 .App-link {
@@ -52,5 +61,11 @@ input {
 }
 
 .drip_button {
+  margin-bottom: 32px;
   width: 100px;
+}
+
+.drip_table {
+  width: 95% !important;
+  margin: 40px 0;
 }
