@@ -1,21 +1,19 @@
 .App {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(8px + 2vmin);
-  color: white;
   text-align: center;
 }
 
-.connect_wallet, .account_address {
+.connect_wallet.MuiButton-root , .account_address {
   margin-bottom: 12px;
 }
 
 .mint_form, .burn_form, .transfer_form {
-  margin-bottom: 4px;
+  margin-bottom: 16px;
 }
 
 .my_balance {
@@ -60,7 +58,7 @@ input {
   margin-left: 4px;
 }
 
-.drip_button {
+.drip_button.MuiButton-root {
   margin-bottom: 32px;
   width: 100px;
 }
@@ -68,4 +66,21 @@ input {
 .drip_table {
   width: 95% !important;
   margin: 40px 0;
+}
+
+.connect_wallet_icon {
+  margin-left: 4px;
+}
+
+.MuiInputAdornment-positionStart p {
+  font-size: smaller;
+}
+
+.submit_button.MuiButton-root {
+  margin-left: 8px;
+  margin-top: 3px;
+}
+
+.transfer_amount_input.MuiFormControl-root {
+  margin-left: 8px;
 }

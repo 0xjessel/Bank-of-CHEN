@@ -1,17 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
+import classNames from 'classnames';
+import { CHENDollasAbi } from './abis';
+
+import './App.css';
+import './success.css';
+
+import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
+import AddIcon from '@material-ui/icons/Add';
+import Button from '@material-ui/core/Button';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import Link from '@material-ui/core/Link';
+import Paper from '@material-ui/core/Paper';
+import SwapHorizRoundedIcon from '@material-ui/icons/SwapHorizRounded';
 import Table from "@material-ui/core/Table";
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import classNames from 'classnames';
-import { CHENDollasAbi } from './abis';
-
-import './App.css';
-import './success.css';
+import TextField from '@material-ui/core/TextField';
 
 const web3 = new Web3(Web3.givenProvider);
 const BN = web3.utils.BN;
@@ -45,7 +53,7 @@ function App() {
       let {
         blockHash,
         returnValues,
-        transactionHash,
+        id,
       } = event;
       const to = returnValues.to;
       const amount = returnValues.amount / (10 ** decimals);
@@ -54,14 +62,13 @@ function App() {
       const row = {
         to,
         amount,
-        transactionHash,
+        id,
         timestamp,
       };
 
       setDripRows(dripRows => [row, ...dripRows]);
     });
-    console.log('effect');
-  }, []);
+  }, [decimals]);
 
   const getAccount = async () => {
     const ethereum = window.ethereum;
@@ -197,65 +204,95 @@ function App() {
   return (
     <div className="App">
       <h1>Bank of 陈CHEN</h1>
-      <button
+      <Button
         className="connect_wallet"
-        onClick={handleConnect}
-        type="Button">
+        variant="contained"
+        onClick={handleConnect}>
         Connect Wallet
-      </button>
+        <AccountBalanceWalletOutlinedIcon
+          className="connect_wallet_icon"
+          fontSize="small"
+        />
+      </Button>
       <span className="account_address">
         My address: { accountAddress }
       </span>
-      <button
+      <Button
         className="drip_button"
-        onClick={handleDrip}
-        type="Button">
-        Drip
-      </button>
+        color="secondary"
+        variant="outlined"
+        onClick={handleDrip}>
+        Drip 💧
+      </Button>
       <form className="mint_form" onSubmit={handleMint}>
-        <label>
-          Mint New Tokens:
-          <input
-            type="text"
-            name="name"
-            value={mintNumber}
-            onChange={ e => setMintNumber(e.target.value) }
-          />
-        </label>
-        <input type="submit" value="Mint" />
+        <TextField
+          variant="outlined"
+          size="small"
+          label="Mint New Tokens"
+          InputProps={{
+            endAdornment: <InputAdornment position="start">陈CHEN</InputAdornment>,
+          }}
+          value={mintNumber}
+          onChange={ e => setMintNumber(e.target.value) }
+        />
+        <Button
+          className="submit_button"
+          type="submit"
+          variant="contained"
+          color="primary"
+          size="small"
+          endIcon={<AddIcon />}>
+          Mint
+        </Button>
       </form>
       <form className="burn_form" onSubmit={handleBurn}>
-        <label>
-          Burn Tokens:
-          <input
-            type="text"
-            name="name"
-            value={burnNumber}
-            onChange={ e => setBurnNumber(e.target.value) }
-          />
-        </label>
-        <input type="submit" value="Burn" />
+        <TextField
+          variant="outlined"
+          size="small"
+          label="Burn Tokens"
+          InputProps={{
+            endAdornment: <InputAdornment position="start">陈CHEN</InputAdornment>,
+          }}
+          value={burnNumber}
+          onChange={ e => setBurnNumber(e.target.value) }
+        />
+        <Button
+          className="submit_button"
+          type="submit"
+          variant="contained"
+          color="primary"
+          size="small">
+          Burn  &nbsp; 🔥
+        </Button>
       </form>
       <form className="transfer_form" onSubmit={handleTransfer}>
-        <label className="address_label">
-          Transfer Address:
-          <input
-            type="text"
-            name="name"
-            value={transferAddress}
-            onChange={ e => setTransferAddress(e.target.value) }
-          />
-        </label>
-        <label>
-          Amount:
-          <input
-            type="text"
-            name="name"
-            value={transferAmount}
-            onChange={ e => setTransferAmount(e.target.value) }
-          />
-        </label>
-        <input type="submit" value="Transfer Now" />
+        <TextField
+          variant="outlined"
+          size="small"
+          label="Transfer Address"
+          value={transferAddress}
+          onChange={ e => setTransferAddress(e.target.value) }
+        />
+        <TextField
+          className="transfer_amount_input"
+          variant="outlined"
+          size="small"
+          label="Amount"
+          InputProps={{
+            endAdornment: <InputAdornment position="start">陈CHEN</InputAdornment>,
+          }}
+          value={transferAmount}
+          onChange={ e => setTransferAmount(e.target.value) }
+        />
+        <Button
+          className="submit_button"
+          type="submit"
+          variant="contained"
+          color="primary"
+          size="small"
+          endIcon={<SwapHorizRoundedIcon />}>
+          Transfer
+        </Button>
       </form>
       <span className="error_msg">{errorMsg}</span>
       <span className="my_balance">
@@ -264,7 +301,7 @@ function App() {
       <span className="total_supply">
         Total Token Supply: { getTokenSupply.toLocaleString() } 陈CHEN
       </span>
-      {dripTable()}
+      {DripTable()}
       <div
         className={classNames({
           success_dialog: true,
@@ -292,9 +329,11 @@ function App() {
     </div>
   );
 
-  function dripTable() {
+  function DripTable() {
     return (
-      <TableContainer className="drip_table" component={Paper}>
+      <TableContainer
+        className="drip_table"
+        component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
@@ -305,13 +344,15 @@ function App() {
           </TableHead>
           <TableBody>
             {getDripRows.map((row) => (
-              <TableRow key={row.transactionHash}>
+              <TableRow key={row.id}>
                 <TableCell component="th" scope="row">
-                  <a
+                  <Link
+                    color="textPrimary"
+                    underline="none"
                     href={'https://ropsten.etherscan.io/address/'+row.to}
                     target="_blank">
                     {row.to}
-                  </a>
+                  </Link>
                 </TableCell>
                 <TableCell align="right">{row.amount}</TableCell>
                 <TableCell align="right">
