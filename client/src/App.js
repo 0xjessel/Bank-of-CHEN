@@ -9,6 +9,7 @@ import './success.css';
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
+import CountUp from 'react-countup';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
@@ -46,9 +47,8 @@ function App() {
   const [circleClassname, setCircleClassname] = useState();
   const [pathClassname, setPathClassname] = useState();
 
-  useEffect(async () => {
-    const totalSupply = await CHENDollasContract.methods.totalSupply().call();
-    setTokenSupply(totalSupply / (10 ** decimals));
+  useEffect(() => {
+    fetchTotalSupply();
 
     CHENDollasContract.events.Drip({
       fromBlock: 0,
@@ -91,9 +91,16 @@ function App() {
       const account = localAccount ?? accountAddress;
       const currentBalance = await CHENDollasContract.methods.balanceOf(account).call();
       setCurrentBalance(currentBalance / (10 ** decimals));
+
+      fetchTotalSupply();
     } catch (e) {
       setErrorMsg(e.message);
     }
+  }
+
+  const fetchTotalSupply = async () => {
+    const totalSupply = await CHENDollasContract.methods.totalSupply().call();
+    setTokenSupply(totalSupply / (10 ** decimals));
   }
 
   const handleConnect = async (e) => {
@@ -296,10 +303,22 @@ function App() {
       </form>
       <span className="error_msg">{errorMsg}</span>
       <span className="my_balance">
-        My Balance: { getCurrentBalance.toLocaleString() } 陈CHEN
+        My Balance:&nbsp;
+        <CountUp
+          end={getCurrentBalance}
+          preserveValue={true}
+          separator=","
+          suffix=" 陈CHEN"
+        />
       </span>
       <span className="total_supply">
-        Total Token Supply: { getTokenSupply.toLocaleString() } 陈CHEN
+        Total Token Supply:&nbsp;
+        <CountUp
+          end={getTokenSupply}
+          preserveValue={true}
+          separator=","
+          suffix=" 陈CHEN"
+        />
       </span>
       {DripTable()}
       <div
@@ -344,7 +363,7 @@ function App() {
           </TableHead>
           <TableBody>
             {getDripRows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow>
                 <TableCell component="th" scope="row">
                   <Link
                     color="textPrimary"
