@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import TruffleContract from '@truffle/contract';
+import CHENDollas from './build/contracts/CHENDollas.json';
 import Web3 from 'web3';
-import classNames from 'classnames';
 import printer from './money-printer.gif';
-import { CHENDollasAbi } from './abis';
 
 import './App.css';
 
@@ -28,10 +28,9 @@ import TextField from '@material-ui/core/TextField';
 const web3 = new Web3(Web3.givenProvider);
 const BN = web3.utils.BN;
 
-const CHENDollasAddr = '0xd36f4FE394829CE309C0907C13A7c3A1233AF013';
-const CHENDollasContract = new web3.eth.Contract(CHENDollasAbi, CHENDollasAddr);
-
 function App() {
+  const [initialized, setInitialized] = useState(false);
+  const [CHENDollasContract, setCHENDollasContract] = useState();
   const [accountAddress, setAccountAddress] = useState('0x0');
   const [decimals, setDecimals] = useState(18);
 
@@ -48,10 +47,26 @@ function App() {
   const [snackSeverity, setSnackSeverity] = useState('success');
   const [snackMessage, setSnackMessage] = useState('');
 
-  useEffect(() => {
-    fetchTotalSupply();
+  async function init() {
+    let Contract = TruffleContract(CHENDollas);
+    Contract.setProvider(Web3.givenProvider);
+    Contract = await Contract.deployed();
+    setCHENDollasContract(Contract);
+    setInitialized(true);
 
-    CHENDollasContract.events.Drip({
+    fetchTotalSupply(Contract);
+
+    return Contract;
+  }
+
+  useEffect(() => {
+    init();
+
+    if (!initialized) {
+      return;
+    }
+
+    CHENDollasContract.Drip({
       fromBlock: 0,
     }).on('data', async (event) => {
       let {
@@ -72,7 +87,7 @@ function App() {
 
       setDripRows(dripRows => [row, ...dripRows]);
     });
-  }, []);
+  }, [initialized]);
 
   const getAccount = async () => {
     const ethereum = window.ethereum;
@@ -90,7 +105,7 @@ function App() {
   const updatePage = async (localAccount) => {
     try {
       const account = localAccount ?? accountAddress;
-      const currentBalance = await CHENDollasContract.methods.balanceOf(account).call();
+      const currentBalance = await CHENDollasContract.balanceOf(account);
       setCurrentBalance(currentBalance / (10 ** decimals));
 
       fetchTotalSupply();
@@ -99,15 +114,16 @@ function App() {
     }
   }
 
-  const fetchTotalSupply = async () => {
-    const totalSupply = await CHENDollasContract.methods.totalSupply().call();
+  const fetchTotalSupply = async (LocalContract) => {
+    const Contract = LocalContract ?? CHENDollasContract;
+    const totalSupply = await Contract.totalSupply();
     setTokenSupply(totalSupply / (10 ** decimals));
   }
 
   const handleConnect = async (e) => {
     try {
       const account = await getAccount();
-      setDecimals(await CHENDollasContract.methods.decimals().call());
+      setDecimals(await CHENDollasContract.decimals());
 
       // pass in account address as it's available in state yet
       await updatePage(account);
@@ -118,13 +134,11 @@ function App() {
 
   const handleDrip = async (e) => {
     try {
-      const gas = await CHENDollasContract.methods.drip().estimateGas({from: accountAddress});
-      const result = await CHENDollasContract.methods.drip().send({
+      const result = await CHENDollasContract.drip({
         from: accountAddress,
-        gas
       });
 
-      if (result.status) {
+      if (result.receipt.status) {
         setOpenDialog(true);
         setTimeout(() => setOpenDialog(false), 3000);
       }
@@ -139,13 +153,8 @@ function App() {
     e.preventDefault();
     try {
       const convertedBurnNumber = new BN(burnNumber).mul(new BN((10 ** decimals).toString()));
-      const gas = await CHENDollasContract.methods.burn(convertedBurnNumber).estimateGas();
-      const result = await CHENDollasContract.methods.burn(convertedBurnNumber).send({
-        from: accountAddress,
-        gas
-      });
-
-      if (result.status) {
+      const result = await CHENDollasContract.burn(convertedBurnNumber, {from: accountAddress});
+      if (result.receipt.status) {
         openSnack('success', 'Successful burn!');
       }
     } catch (e) {
@@ -159,12 +168,8 @@ function App() {
     e.preventDefault();
     try {
       const convertedMintNumber = new BN(mintNumber).mul(new BN((10 ** decimals).toString()));
-      const gas = await CHENDollasContract.methods.mint(accountAddress, convertedMintNumber.toString()).estimateGas();
-      const result = await CHENDollasContract.methods.mint(accountAddress, convertedMintNumber.toString()).send({
-        from: accountAddress,
-        gas
-      });
-      if (result.status) {
+      const result = await CHENDollasContract.mint(accountAddress, convertedMintNumber.toString(), { from: accountAddress });
+      if (result.receipt.status) {
         openSnack('success', 'Successful mint!');
       }
     } catch (e) {
@@ -178,13 +183,9 @@ function App() {
     e.preventDefault();
     try {
       const convertedTransferAmount = new BN(transferAmount).mul(new BN((10 ** decimals).toString()));
-      const gas = await CHENDollasContract.methods.transfer(transferAddress, convertedTransferAmount.toString()).estimateGas();
-      const result = await CHENDollasContract.methods.transfer(transferAddress, convertedTransferAmount.toString()).send({
-        from: accountAddress,
-        gas,
-      });
+      const result = await CHENDollasContract.transfer(transferAddress, convertedTransferAmount.toString(), {from: accountAddress});
 
-      if (result.status) {
+      if (result.receipt.status) {
         openSnack('success', 'Successful transfer!');
       }
     } catch (e) {
@@ -208,6 +209,9 @@ function App() {
     setSnackMessage(message);
   }
 
+  if (!initialized) {
+    return (<span> Loading... </span>);
+  }
   return (
     <div className="App">
       <h1>Bank of 陈CHEN</h1>
