@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
 import classNames from 'classnames';
+import printer from './money-printer.gif';
 import { CHENDollasAbi } from './abis';
 
 import './App.css';
@@ -10,6 +11,7 @@ import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceW
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 import CountUp from 'react-countup';
+import Dialog from '@material-ui/core/Dialog';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
@@ -42,6 +44,7 @@ function App() {
 
   const [errorMsg, setErrorMsg] = useState();
 
+  const [openDialog, setOpenDialog] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [svgClassname, setSvgClassname] = useState();
   const [circleClassname, setCircleClassname] = useState();
@@ -124,7 +127,8 @@ function App() {
       });
 
       if (result.status) {
-        showSuccessPopup();
+        setOpenDialog(true);
+        setTimeout(() => setOpenDialog(false), 3000);
       }
     } catch (e) {
       setErrorMsg(e.message);
@@ -199,6 +203,10 @@ function App() {
     setPathClassname('checkmark__check');
   }
 
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  }
+
   const onSuccessAnimationEnd = () => {
     setShowSuccess(false);
 
@@ -226,11 +234,20 @@ function App() {
       </span>
       <Button
         className="drip_button"
-        color="secondary"
+        style={{backgroundColor: '#4caf50', color: '#FFFFFF'}}
         variant="outlined"
         onClick={handleDrip}>
-        Drip 💧
+        Print &nbsp;💸
       </Button>
+      <Dialog
+        scroll="body"
+        onClose={handleCloseDialog}
+        open={openDialog}>
+        <img
+          src={printer}
+          alt="BRRRRRRR"
+        />
+      </Dialog>
       <form className="mint_form" onSubmit={handleMint}>
         <TextField
           variant="outlined"
@@ -363,7 +380,7 @@ function App() {
           </TableHead>
           <TableBody>
             {getDripRows.map((row) => (
-              <TableRow>
+              <TableRow key={row.id}>
                 <TableCell component="th" scope="row">
                   <Link
                     color="textPrimary"
