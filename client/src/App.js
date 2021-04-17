@@ -49,14 +49,12 @@ function App() {
 
   async function init() {
     let Contract = TruffleContract(CHENDollas);
-    Contract.setProvider(Web3.givenProvider);
+    Contract.setProvider(web3.givenProvider);
     Contract = await Contract.deployed();
     setCHENDollasContract(Contract);
     setInitialized(true);
 
     fetchTotalSupply(Contract);
-
-    return Contract;
   }
 
   useEffect(() => {
@@ -85,7 +83,7 @@ function App() {
         timestamp,
       };
 
-      setDripRows(dripRows => [row, ...dripRows]);
+      setDripRows(dripRows => [row, ...dripRows].slice(0, 10));
     });
   }, [initialized]);
 
@@ -210,8 +208,9 @@ function App() {
   }
 
   if (!initialized) {
-    return (<span> Loading... </span>);
+    return null;
   }
+
   return (
     <div className="App">
       <h1>Bank of 陈CHEN</h1>
