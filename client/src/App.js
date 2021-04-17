@@ -5,16 +5,17 @@ import printer from './money-printer.gif';
 import { CHENDollasAbi } from './abis';
 
 import './App.css';
-import './success.css';
 
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import AddIcon from '@material-ui/icons/Add';
+import Alert from '@material-ui/lab/Alert';
 import Button from '@material-ui/core/Button';
 import CountUp from 'react-countup';
 import Dialog from '@material-ui/core/Dialog';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
+import Snackbar from '@material-ui/core/Snackbar';
 import SwapHorizRoundedIcon from '@material-ui/icons/SwapHorizRounded';
 import Table from "@material-ui/core/Table";
 import TableBody from '@material-ui/core/TableBody';
@@ -42,13 +43,10 @@ function App() {
   const [getCurrentBalance, setCurrentBalance] = useState(0);
   const [getDripRows, setDripRows] = useState([]);
 
-  const [errorMsg, setErrorMsg] = useState();
-
   const [openDialog, setOpenDialog] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [svgClassname, setSvgClassname] = useState();
-  const [circleClassname, setCircleClassname] = useState();
-  const [pathClassname, setPathClassname] = useState();
+  const [snackOpen, setSnackOpen] = useState(false);
+  const [snackSeverity, setSnackSeverity] = useState('success');
+  const [snackMessage, setSnackMessage] = useState('');
 
   useEffect(() => {
     fetchTotalSupply();
@@ -97,7 +95,7 @@ function App() {
 
       fetchTotalSupply();
     } catch (e) {
-      setErrorMsg(e.message);
+      openSnack('error', e.message);
     }
   }
 
@@ -114,7 +112,7 @@ function App() {
       // pass in account address as it's available in state yet
       await updatePage(account);
     } catch (e) {
-      setErrorMsg(e.message);
+      openSnack('error', e.message);
     }
   }
 
@@ -131,7 +129,7 @@ function App() {
         setTimeout(() => setOpenDialog(false), 3000);
       }
     } catch (e) {
-      setErrorMsg(e.message);
+      openSnack('error', e.message);
     }
 
     await updatePage();
@@ -148,10 +146,10 @@ function App() {
       });
 
       if (result.status) {
-        showSuccessPopup();
+        openSnack('success', 'Successful burn!');
       }
     } catch (e) {
-      setErrorMsg(e.message);
+      openSnack('error', e.message);
     }
 
     await updatePage();
@@ -167,10 +165,10 @@ function App() {
         gas
       });
       if (result.status) {
-        showSuccessPopup();
+        openSnack('success', 'Successful mint!');
       }
     } catch (e) {
-      setErrorMsg(e.message);
+      openSnack('error', e.message);
     }
 
     await updatePage();
@@ -187,33 +185,27 @@ function App() {
       });
 
       if (result.status) {
-        showSuccessPopup();
+        openSnack('success', 'Successful transfer!');
       }
     } catch (e) {
-      setErrorMsg(e.message);
+      openSnack('error', e.message);
     }
 
     await updatePage();
-  }
-
-  function showSuccessPopup() {
-    setShowSuccess(true);
-    setSvgClassname('checkmark');
-    setCircleClassname('checkmark__circle');
-    setPathClassname('checkmark__check');
   }
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
   }
 
-  const onSuccessAnimationEnd = () => {
-    setShowSuccess(false);
+  const handleSnackClose = () => {
+    setSnackOpen(false);
+  }
 
-    // reset animation
-    setSvgClassname('');
-    setCircleClassname('');
-    setPathClassname('');
+  function openSnack(severity, message) {
+    setSnackOpen(true);
+    setSnackSeverity(severity);
+    setSnackMessage(message);
   }
 
   return (
@@ -291,6 +283,7 @@ function App() {
       </form>
       <form className="transfer_form" onSubmit={handleTransfer}>
         <TextField
+          className="transfer_address_input"
           variant="outlined"
           size="small"
           label="Transfer Address"
@@ -318,7 +311,6 @@ function App() {
           Transfer
         </Button>
       </form>
-      <span className="error_msg">{errorMsg}</span>
       <span className="my_balance">
         My Balance:&nbsp;
         <CountUp
@@ -338,30 +330,15 @@ function App() {
         />
       </span>
       {DripTable()}
-      <div
-        className={classNames({
-          success_dialog: true,
-          hidden: !showSuccess,
-        })}>
-        <svg
-          className={svgClassname}
-          xmlns="checkmark"
-          viewBox="0 0 52 52">
-          <circle
-            className={circleClassname}
-            cx="26"
-            cy="26"
-            r="25"
-            fill="none"
-          />
-          <path
-            className={pathClassname}
-            fill="none"
-            d="M14.1 27.2l7.1 7.2 16.7-16.8"
-            onAnimationEnd={onSuccessAnimationEnd}
-          />
-        </svg>
-      </div>
+      <Snackbar open={snackOpen} autoHideDuration={5000} onClose={handleSnackClose}>
+        <Alert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackClose}
+          severity={snackSeverity}>
+          {snackMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 

@@ -48,12 +48,6 @@
   margin-right: 12px;
 }
 
-.error_msg {
-  color: red;
-  width: 80%;
-  font-size: small;
-}
-
 input {
   margin-left: 4px;
 }
@@ -83,6 +77,10 @@ input {
 .submit_button.MuiButton-root {
   margin-left: 8px;
   margin-top: 3px;
+}
+
+.transfer_address_input {
+  width: 420px;
 }
 
 .transfer_amount_input.MuiFormControl-root {
