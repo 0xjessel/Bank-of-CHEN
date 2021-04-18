@@ -86,3 +86,8 @@ input {
 .transfer_amount_input.MuiFormControl-root {
   margin-left: 8px;
 }
+
+.print_dialog .MuiDialog-paper {
+  background-color: transparent;
+  padding: 20px;
+}

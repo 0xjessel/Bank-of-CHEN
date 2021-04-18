@@ -5,6 +5,7 @@ import Web3 from 'web3';
 import printer from './money-printer.gif';
 
 import './App.css';
+import 'csshake';
 
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import AddIcon from '@material-ui/icons/Add';
@@ -72,7 +73,7 @@ function App() {
     };
 
     CHENDollasContract.Drip({
-      fromBlock: 0, // TODO: don't start from block 0
+      fromBlock: 0, // TODO: don't start from block 0: https://bit.ly/3tuwqW2
     }).on('data', async (event) => addTableRow(event, ACTIONS.PRINT));
 
     CHENDollasContract.Transfer({
@@ -265,10 +266,12 @@ function App() {
         Print &nbsp;💸
       </Button>
       <Dialog
+        className="print_dialog"
         scroll="body"
         onClose={handleCloseDialog}
         open={openDialog}>
         <img
+          className="shake-constant shake-hard"
           src={printer}
           alt="BRRRRRRR"
         />
