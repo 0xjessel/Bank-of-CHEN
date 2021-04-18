@@ -40,7 +40,7 @@ function App() {
   const [transferAmount, setTransferAmount] = useState(0);
   const [getTokenSupply, setTokenSupply] = useState(0);
   const [getCurrentBalance, setCurrentBalance] = useState(0);
-  const [getDripRows, setDripRows] = useState([]);
+  const [getTableRows, setTableRows] = useState([]);
 
   const [openDialog, setOpenDialog] = useState(false);
   const [snackOpen, setSnackOpen] = useState(false);
@@ -64,27 +64,57 @@ function App() {
       return;
     }
 
+    const ACTIONS = {
+      PRINT: 'Print 💸',
+      MINT: 'Mint ＋',
+      BURN: 'Burn 🔥',
+      TRANSFER: 'Transfer ➡️',
+    };
+
     CHENDollasContract.Drip({
-      fromBlock: 0,
-    }).on('data', async (event) => {
+      fromBlock: 0, // TODO: don't start from block 0
+    }).on('data', async (event) => addTableRow(event, ACTIONS.PRINT));
+
+    CHENDollasContract.Transfer({
+      fromBlock: 0, // TODO: don't start from block 0
+    }).on('data', async (event) => addTableRow(event, undefined));
+
+    async function addTableRow(event, action) {
+      const zeroAddress = '0x0000000000000000000000000000000000000000';
+      let address;
+
       let {
         blockHash,
         returnValues,
         id,
       } = event;
-      const to = returnValues.to;
-      const amount = returnValues.amount / (10 ** decimals);
+
+      if (action === ACTIONS.PRINT) {
+        address = returnValues.to;
+      } else if (returnValues.to === zeroAddress) {
+        action = ACTIONS.BURN;
+        address = returnValues.from;
+      } else if (returnValues.from === zeroAddress) {
+        action = ACTIONS.MINT;
+        address = returnValues.to;
+      } else {
+        action = ACTIONS.TRANSFER;
+        address = returnValues.from;
+      }
+
+      const amount = (returnValues.amount ?? returnValues.value) / (10 ** decimals);
       const timestamp = (await web3.eth.getBlock(blockHash)).timestamp * 1000;
 
       const row = {
-        to,
+        address,
+        action: action,
         amount,
         id,
         timestamp,
       };
 
-      setDripRows(dripRows => [row, ...dripRows].slice(0, 10));
-    });
+      setTableRows(getTableRows => [row, ...getTableRows].sort((x, y) => y.timestamp - x.timestamp).slice(0, 10));
+    }
   }, [initialized]);
 
   const getAccount = async () => {
@@ -332,7 +362,7 @@ function App() {
           suffix=" 陈CHEN"
         />
       </span>
-      {DripTable()}
+      {TransactionTable()}
       <Snackbar open={snackOpen} autoHideDuration={5000} onClose={handleSnackClose}>
         <Alert
           elevation={6}
@@ -345,31 +375,33 @@ function App() {
     </div>
   );
 
-  function DripTable() {
+  function TransactionTable() {
     return (
       <TableContainer
-        className="drip_table"
+        className="transaction_table"
         component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell align="left">Address</TableCell>
+              <TableCell align="right">Action</TableCell>
               <TableCell align="right">Amount</TableCell>
               <TableCell align="right">Date</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {getDripRows.map((row) => (
+            {getTableRows.map((row) => (
               <TableRow key={row.id}>
                 <TableCell component="th" scope="row">
                   <Link
                     color="textPrimary"
                     underline="none"
-                    href={'https://ropsten.etherscan.io/address/'+row.to}
+                    href={'https://ropsten.etherscan.io/address/'+row.address}
                     target="_blank">
-                    {row.to}
+                    {row.address}
                   </Link>
                 </TableCell>
+                <TableCell align="right">{row.action}</TableCell>
                 <TableCell align="right">{row.amount}</TableCell>
                 <TableCell align="right">
                   {new Date(row.timestamp).toLocaleString()}
