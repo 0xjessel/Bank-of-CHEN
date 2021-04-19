@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import TruffleContract from '@truffle/contract';
 import CHENDollas from './build/contracts/CHENDollas.json';
+import MetaMaskOnboarding from '@metamask/onboarding';
 import Web3 from 'web3';
 import printer from './money-printer.gif';
 
 import './App.css';
+import { ACTIONS, isMetaMaskInstalled } from './utils.js';
 import 'csshake';
 
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
@@ -30,6 +32,8 @@ const web3 = new Web3(Web3.givenProvider);
 const BN = web3.utils.BN;
 
 function App() {
+  const onboarding = React.useRef();
+
   const [initialized, setInitialized] = useState(false);
   const [CHENDollasContract, setCHENDollasContract] = useState();
   const [accountAddress, setAccountAddress] = useState('0x0');
@@ -49,28 +53,28 @@ function App() {
   const [snackMessage, setSnackMessage] = useState('');
 
   async function init() {
-    let Contract = TruffleContract(CHENDollas);
-    Contract.setProvider(web3.givenProvider);
-    Contract = await Contract.deployed();
-    setCHENDollasContract(Contract);
-    setInitialized(true);
+    if (isMetaMaskInstalled()) {
+      let Contract = TruffleContract(CHENDollas);
+      Contract.setProvider(web3.givenProvider);
+      Contract = await Contract.deployed();
+      setCHENDollasContract(Contract);
 
-    fetchTotalSupply(Contract);
+      fetchTotalSupply(Contract);
+    }
+
+    setInitialized(true);
   }
 
   useEffect(() => {
-    init();
-
-    if (!initialized) {
-      return;
+    if (!onboarding.current) {
+      onboarding.current = new MetaMaskOnboarding();
     }
 
-    const ACTIONS = {
-      PRINT: 'Print 💸',
-      MINT: 'Mint ＋',
-      BURN: 'Burn 🔥',
-      TRANSFER: 'Transfer ➡️',
-    };
+    init();
+
+    if (!initialized || !isMetaMaskInstalled()) {
+      return;
+    }
 
     CHENDollasContract.Drip({
       fromBlock: 0, // TODO: don't start from block 0: https://bit.ly/3tuwqW2
@@ -164,6 +168,13 @@ function App() {
   }
 
   const handleConnect = async (e) => {
+    if (!isMetaMaskInstalled()) {
+      onboarding.current.startOnboarding();
+      return;
+    } else {
+      onboarding.current.stopOnboarding();
+    }
+
     try {
       const account = await getAccount();
       setDecimals(await CHENDollasContract.decimals());
