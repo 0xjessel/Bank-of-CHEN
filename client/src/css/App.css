@@ -16,10 +16,6 @@
   margin-bottom: 16px;
 }
 
-.my_balance {
-  margin: 12px 0;
-}
-
 .address_label {
   margin-right: 12px;
 }
@@ -35,11 +31,6 @@ input {
 
 .drip_button:hover {
   background-color: #429C46 !important;
-}
-
-.transaction_table {
-  width: 95% !important;
-  margin: 40px 0;
 }
 
 .connect_wallet_icon {
@@ -61,9 +52,4 @@ input {
 
 .transfer_amount_input.MuiFormControl-root {
   margin-left: 8px;
-}
-
-.print_dialog .MuiDialog-paper {
-  background-color: transparent;
-  padding: 20px;
 }

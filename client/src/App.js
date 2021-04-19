@@ -3,30 +3,20 @@ import TruffleContract from '@truffle/contract';
 import CHENDollas from './build/contracts/CHENDollas.json';
 import MetaMaskOnboarding from '@metamask/onboarding';
 import Web3 from 'web3';
-import printer from './money-printer.gif';
 
-import './App.css';
+import './css/App.css';
 import { ACTIONS, isMetaMaskInstalled } from './utils.js';
-import 'csshake';
 
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import AddIcon from '@material-ui/icons/Add';
-import Alert from '@material-ui/lab/Alert';
 import Button from '@material-ui/core/Button';
-import CountUp from 'react-countup';
-import Dialog from '@material-ui/core/Dialog';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import Link from '@material-ui/core/Link';
-import Paper from '@material-ui/core/Paper';
-import Snackbar from '@material-ui/core/Snackbar';
+import CHENTextField from './ui/CHENTextField';
+import MyBalanceCounter from './ui/MyBalanceCounter';
+import SnackbarPopup from './ui/SnackbarPopup';
+import TotalTokenSupplyCounter from './ui/TotalTokenSupplyCounter';
+import PrinterDialog from './ui/PrinterDialog';
 import SwapHorizRoundedIcon from '@material-ui/icons/SwapHorizRounded';
-import Table from "@material-ui/core/Table";
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TextField from '@material-ui/core/TextField';
+import TransactionTable from './ui/TransactionTable';
 
 const web3 = new Web3(Web3.givenProvider);
 const BN = web3.utils.BN;
@@ -47,10 +37,12 @@ function App() {
   const [getCurrentBalance, setCurrentBalance] = useState(0);
   const [getTableRows, setTableRows] = useState([]);
 
-  const [openDialog, setOpenDialog] = useState(false);
+  const [openPrinterDialog, setOpenPrinterDialog] = useState(false);
   const [snackOpen, setSnackOpen] = useState(false);
-  const [snackSeverity, setSnackSeverity] = useState('success');
-  const [snackMessage, setSnackMessage] = useState('');
+  const [snackProps, setSnackProps] = useState({
+    severity: 'success',
+    message: '',
+  });
 
   async function init() {
     if (isMetaMaskInstalled()) {
@@ -59,7 +51,10 @@ function App() {
       Contract = await Contract.deployed();
       setCHENDollasContract(Contract);
 
-      fetchTotalSupply(Contract);
+      setDecimals(
+        (await Contract.decimals()),
+        fetchTotalSupply(Contract),
+      );
     }
 
     setInitialized(true);
@@ -177,7 +172,6 @@ function App() {
 
     try {
       const account = await getAccount();
-      setDecimals(await CHENDollasContract.decimals());
 
       // pass in account address as it's available in state yet
       await updatePage(account);
@@ -193,8 +187,7 @@ function App() {
       });
 
       if (result.receipt.status) {
-        setOpenDialog(true);
-        setTimeout(() => setOpenDialog(false), 3000);
+        setOpenPrinterDialog(true, setTimeout(() => setOpenPrinterDialog(false), 3000));
       }
     } catch (e) {
       openSnack('error', e.message);
@@ -249,18 +242,9 @@ function App() {
     await updatePage();
   }
 
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  }
-
-  const handleSnackClose = () => {
-    setSnackOpen(false);
-  }
-
   function openSnack(severity, message) {
     setSnackOpen(true);
-    setSnackSeverity(severity);
-    setSnackMessage(message);
+    setSnackProps({ 'severity': severity, 'message': message});
   }
 
   if (!initialized) {
@@ -290,25 +274,13 @@ function App() {
         onClick={handleDrip}>
         Print &nbsp;💸
       </Button>
-      <Dialog
-        className="print_dialog"
-        scroll="body"
-        onClose={handleCloseDialog}
-        open={openDialog}>
-        <img
-          className="shake-constant shake-hard"
-          src={printer}
-          alt="BRRRRRRR"
-        />
-      </Dialog>
+      <PrinterDialog
+        handleCloseDialog={() => setOpenPrinterDialog(false)}
+        open={openPrinterDialog}
+      />
       <form className="mint_form" onSubmit={handleMint}>
-        <TextField
-          variant="outlined"
-          size="small"
+        <CHENTextField
           label="Mint New Tokens"
-          InputProps={{
-            endAdornment: <InputAdornment position="start">陈CHEN</InputAdornment>,
-          }}
           value={mintNumber}
           onChange={ e => setMintNumber(e.target.value) }
         />
@@ -323,13 +295,8 @@ function App() {
         </Button>
       </form>
       <form className="burn_form" onSubmit={handleBurn}>
-        <TextField
-          variant="outlined"
-          size="small"
+        <CHENTextField
           label="Burn Tokens"
-          InputProps={{
-            endAdornment: <InputAdornment position="start">陈CHEN</InputAdornment>,
-          }}
           value={burnNumber}
           onChange={ e => setBurnNumber(e.target.value) }
         />
@@ -343,22 +310,15 @@ function App() {
         </Button>
       </form>
       <form className="transfer_form" onSubmit={handleTransfer}>
-        <TextField
+        <CHENTextField
           className="transfer_address_input"
-          variant="outlined"
-          size="small"
           label="Transfer Address"
           value={transferAddress}
           onChange={ e => setTransferAddress(e.target.value) }
         />
-        <TextField
+        <CHENTextField
           className="transfer_amount_input"
-          variant="outlined"
-          size="small"
           label="Amount"
-          InputProps={{
-            endAdornment: <InputAdornment position="start">陈CHEN</InputAdornment>,
-          }}
           value={transferAmount}
           onChange={ e => setTransferAmount(e.target.value) }
         />
@@ -372,75 +332,17 @@ function App() {
           Transfer
         </Button>
       </form>
-      <span className="my_balance">
-        My Balance:&nbsp;
-        <CountUp
-          end={getCurrentBalance}
-          preserveValue={true}
-          separator=","
-          suffix=" 陈CHEN"
-        />
-      </span>
-      <span className="total_supply">
-        Total Token Supply:&nbsp;
-        <CountUp
-          end={getTokenSupply}
-          preserveValue={true}
-          separator=","
-          suffix=" 陈CHEN"
-        />
-      </span>
-      {TransactionTable()}
-      <Snackbar open={snackOpen} autoHideDuration={5000} onClose={handleSnackClose}>
-        <Alert
-          elevation={6}
-          variant="filled"
-          onClose={handleSnackClose}
-          severity={snackSeverity}>
-          {snackMessage}
-        </Alert>
-      </Snackbar>
+      <MyBalanceCounter currentBalance={getCurrentBalance}/>
+      <TotalTokenSupplyCounter tokenSupply={getTokenSupply}/>
+      <TransactionTable rows={getTableRows} />
+      <SnackbarPopup
+        open={snackOpen}
+        onClose={() => setSnackOpen(false)}
+        severity={snackProps.severity}
+        message={snackProps.message}
+      />
     </div>
   );
-
-  function TransactionTable() {
-    return (
-      <TableContainer
-        className="transaction_table"
-        component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell align="left">Address</TableCell>
-              <TableCell align="right">Action</TableCell>
-              <TableCell align="right">Amount</TableCell>
-              <TableCell align="right">Date</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {getTableRows.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell component="th" scope="row">
-                  <Link
-                    color="textPrimary"
-                    underline="none"
-                    href={'https://ropsten.etherscan.io/address/'+row.address}
-                    target="_blank">
-                    {row.address}
-                  </Link>
-                </TableCell>
-                <TableCell align="right">{row.action}</TableCell>
-                <TableCell align="right">{row.amount}</TableCell>
-                <TableCell align="right">
-                  {new Date(row.timestamp).toLocaleString()}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
-  }
 }
 
 export default App;
