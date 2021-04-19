@@ -128,6 +128,8 @@ function App() {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
     setAccountAddress(accounts[0]);
 
+    window.ethereum.on('accountsChanged', (accounts) => setAccountAddress(accounts[0]));
+
     return accounts[0];
   }
 
@@ -142,6 +144,14 @@ function App() {
       openSnack('error', e.message);
     }
   }
+
+  useEffect(() => {
+    if (!initialized) {
+      return;
+    }
+
+    updatePage();
+  }, [accountAddress]);
 
   const fetchTotalSupply = async (LocalContract) => {
     const Contract = LocalContract ?? CHENDollasContract;
