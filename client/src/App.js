@@ -116,6 +116,10 @@ function App() {
 
       setTableRows(getTableRows => [row, ...getTableRows].sort((x, y) => y.timestamp - x.timestamp).slice(0, 10));
     }
+
+    return () => {
+      web3.eth.clearSubscriptions();
+    };
   }, [initialized]);
 
   const getAccount = async () => {
