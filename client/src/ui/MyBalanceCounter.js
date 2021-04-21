@@ -1,14 +1,19 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { getCurrentBalance } from '../store/currentBalanceSlice';
+
 import '../css/MyBalanceCounter.css';
 
 import CountUp from 'react-countup';
 
-export default function(props) {
+export default function() {
+  const count = useSelector(getCurrentBalance);
+
   return (
     <span className="my_balance">
-      My Balance:&nbsp;
+      My Balance:{' '}
       <CountUp
-        end={props.currentBalance}
+        end={count}
         preserveValue={true}
         separator=","
         suffix=" 陈CHEN"

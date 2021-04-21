@@ -1,13 +1,17 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { getTokenSupply } from '../store/tokenSupplySlice';
 
 import CountUp from 'react-countup';
 
-export default function(props) {
+export default function() {
+  const count = useSelector(getTokenSupply);
+
   return (
     <span>
       Total Token Supply:&nbsp;
       <CountUp
-        end={props.tokenSupply}
+        end={count}
         preserveValue={true}
         separator=","
         suffix=" 陈CHEN"

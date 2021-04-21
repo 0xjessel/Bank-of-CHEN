@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux'
 import TruffleContract from '@truffle/contract';
 import CHENDollas from './build/contracts/CHENDollas.json';
 import MetaMaskOnboarding from '@metamask/onboarding';
 import Web3 from 'web3';
 
 import './css/App.css';
-import { ACTIONS, isMetaMaskInstalled } from './utils.js';
+import { ACTIONS, isMetaMaskInstalled } from './utils'
 
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import AddIcon from '@material-ui/icons/Add';
@@ -16,13 +17,20 @@ import SnackbarPopup from './ui/SnackbarPopup';
 import TotalTokenSupplyCounter from './ui/TotalTokenSupplyCounter';
 import PrinterDialog from './ui/PrinterDialog';
 import SwapHorizRoundedIcon from '@material-ui/icons/SwapHorizRounded';
-import TransactionTable from './ui/TransactionTable';
+import TransactionsTable from './ui/TransactionsTable';
+
+import { prependRow } from './store/transactionsSlice';
+import { openSnack, closeSnack } from './store/snackSlice';
+import { turnOnPrinter, turnOffPrinter, turnOffPrinterAsync } from './store/printerSlice';
+import { setTokenSupply } from './store/tokenSupplySlice';
+import { setCurrentBalance } from './store/currentBalanceSlice';
 
 const web3 = new Web3(Web3.givenProvider);
 const BN = web3.utils.BN;
 
 function App() {
   const onboarding = React.useRef();
+  const dispatch = useDispatch();
 
   const [initialized, setInitialized] = useState(false);
   const [CHENDollasContract, setCHENDollasContract] = useState();
@@ -33,16 +41,6 @@ function App() {
   const [burnNumber, setBurnNumber] = useState(0);
   const [transferAddress, setTransferAddress] = useState('0x0');
   const [transferAmount, setTransferAmount] = useState(0);
-  const [getTokenSupply, setTokenSupply] = useState(0);
-  const [getCurrentBalance, setCurrentBalance] = useState(0);
-  const [getTableRows, setTableRows] = useState([]);
-
-  const [openPrinterDialog, setOpenPrinterDialog] = useState(false);
-  const [snackOpen, setSnackOpen] = useState(false);
-  const [snackProps, setSnackProps] = useState({
-    severity: 'success',
-    message: '',
-  });
 
   async function init() {
     if (isMetaMaskInstalled()) {
@@ -113,7 +111,7 @@ function App() {
         timestamp,
       };
 
-      setTableRows(getTableRows => [row, ...getTableRows].sort((x, y) => y.timestamp - x.timestamp).slice(0, 10));
+      dispatch(prependRow(row));
     }
 
     return () => {
@@ -140,11 +138,15 @@ function App() {
     try {
       const account = localAccount ?? accountAddress;
       const currentBalance = await CHENDollasContract.balanceOf(account);
-      setCurrentBalance(currentBalance / (10 ** decimals));
+      dispatch(setCurrentBalance(currentBalance / (10 ** decimals)));
 
       fetchTotalSupply();
     } catch (e) {
-      openSnack('error', e.message);
+      dispatch(openSnack({
+        'open': true,
+        'severity': 'error',
+        'message': e.message,
+      }));
     }
   }
 
@@ -159,7 +161,7 @@ function App() {
   const fetchTotalSupply = async (LocalContract) => {
     const Contract = LocalContract ?? CHENDollasContract;
     const totalSupply = await Contract.totalSupply();
-    setTokenSupply(totalSupply / (10 ** decimals));
+    dispatch(setTokenSupply(totalSupply / (10 ** decimals)));
   }
 
   const handleConnect = async (e) => {
@@ -176,7 +178,11 @@ function App() {
       // pass in account address as it's available in state yet
       await updatePage(account);
     } catch (e) {
-      openSnack('error', e.message);
+      dispatch(openSnack({
+        'open': true,
+        'severity': 'error',
+        'message': e.message,
+      }));
     }
   }
 
@@ -187,10 +193,15 @@ function App() {
       });
 
       if (result.receipt.status) {
-        setOpenPrinterDialog(true, setTimeout(() => setOpenPrinterDialog(false), 3000));
+        dispatch(turnOnPrinter());
+        dispatch(turnOffPrinterAsync());
       }
     } catch (e) {
-      openSnack('error', e.message);
+      dispatch(openSnack({
+        'open': true,
+        'severity': 'error',
+        'message': e.message,
+      }));
     }
 
     await updatePage();
@@ -202,10 +213,18 @@ function App() {
       const convertedBurnNumber = new BN(burnNumber).mul(new BN((10 ** decimals).toString()));
       const result = await CHENDollasContract.burn(convertedBurnNumber, {from: accountAddress});
       if (result.receipt.status) {
-        openSnack('success', 'Successful burn!');
+        dispatch(openSnack({
+          'open': true,
+          'severity': 'success',
+          'message': 'Successful burn!',
+        }));
       }
     } catch (e) {
-      openSnack('error', e.message);
+      dispatch(openSnack({
+        'open': true,
+        'severity': 'error',
+        'message': e.message,
+      }));
     }
 
     await updatePage();
@@ -217,7 +236,11 @@ function App() {
       const convertedMintNumber = new BN(mintNumber).mul(new BN((10 ** decimals).toString()));
       const result = await CHENDollasContract.mint(accountAddress, convertedMintNumber.toString(), { from: accountAddress });
       if (result.receipt.status) {
-        openSnack('success', 'Successful mint!');
+        dispatch(openSnack({
+          'open': true,
+          'severity': 'success',
+          'message': 'Successful mint!',
+        }));
       }
     } catch (e) {
       openSnack('error', e.message);
@@ -240,11 +263,6 @@ function App() {
     }
 
     await updatePage();
-  }
-
-  function openSnack(severity, message) {
-    setSnackOpen(true);
-    setSnackProps({ 'severity': severity, 'message': message});
   }
 
   if (!initialized) {
@@ -275,8 +293,7 @@ function App() {
         Print &nbsp;💸
       </Button>
       <PrinterDialog
-        handleCloseDialog={() => setOpenPrinterDialog(false)}
-        open={openPrinterDialog}
+        handleCloseDialog={() => dispatch(turnOffPrinter())}
       />
       <form className="mint_form" onSubmit={handleMint}>
         <CHENTextField
@@ -332,15 +349,10 @@ function App() {
           Transfer
         </Button>
       </form>
-      <MyBalanceCounter currentBalance={getCurrentBalance}/>
-      <TotalTokenSupplyCounter tokenSupply={getTokenSupply}/>
-      <TransactionTable rows={getTableRows} />
-      <SnackbarPopup
-        open={snackOpen}
-        onClose={() => setSnackOpen(false)}
-        severity={snackProps.severity}
-        message={snackProps.message}
-      />
+      <MyBalanceCounter />
+      <TotalTokenSupplyCounter />
+      <TransactionsTable />
+      <SnackbarPopup onClose={() => dispatch(closeSnack())} />
     </div>
   );
 }

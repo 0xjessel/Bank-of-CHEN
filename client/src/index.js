@@ -1,9 +1,12 @@
+import App from './App';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import store from './store/store';
+import { Provider } from 'react-redux';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
-import CssBaseline from '@material-ui/core/CssBaseline';
+
 import './css/index.css';
-import App from './App';
 
 
 import reportWebVitals from './reportWebVitals';
@@ -16,10 +19,12 @@ const theme = createMuiTheme({
 
 ReactDOM.render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <App />
-    </ThemeProvider>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <App />
+      </ThemeProvider>
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

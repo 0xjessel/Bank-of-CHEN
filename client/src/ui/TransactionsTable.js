@@ -1,5 +1,8 @@
 import React from 'react';
-import '../css/TransactionTable.css';
+import { useSelector } from 'react-redux';
+import { selectRows } from '../store/transactionsSlice';
+
+import '../css/TransactionsTable.css';
 
 import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
@@ -10,7 +13,9 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 
-export default function TransactionTable(props) {
+export default function TransactionsTable() {
+  const rows = useSelector(selectRows);
+
   return (
     <TableContainer
       className="transaction_table"
@@ -25,7 +30,7 @@ export default function TransactionTable(props) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.rows.map((row) => (
+          {rows.map((row) => (
             <TableRow key={row.id}>
               <TableCell component="th" scope="row">
                 <Link
