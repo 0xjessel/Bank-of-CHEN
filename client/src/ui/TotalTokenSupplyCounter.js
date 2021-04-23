@@ -4,7 +4,7 @@ import { getTokenSupply } from '../store/tokenSupplySlice';
 
 import CountUp from 'react-countup';
 
-export default function() {
+export default function TotalTokenSupplyCounter() {
   const count = useSelector(getTokenSupply);
 
   return (

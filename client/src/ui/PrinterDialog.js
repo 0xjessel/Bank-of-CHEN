@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux'
-import { isPrinterOn, turnOffPrinter } from '../store/printerSlice';
+import React from 'react';
+import { useSelector } from 'react-redux'
+import { isPrinterOn } from '../store/printerSlice';
 
 import printer from '../img/money-printer.gif';
 import '../css/PrinterDialog.css';

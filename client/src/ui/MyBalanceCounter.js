@@ -6,7 +6,7 @@ import '../css/MyBalanceCounter.css';
 
 import CountUp from 'react-countup';
 
-export default function() {
+export default function MyBalanceCounter() {
   const count = useSelector(getCurrentBalance);
 
   return (

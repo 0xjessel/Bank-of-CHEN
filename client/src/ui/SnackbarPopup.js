@@ -9,7 +9,7 @@ import {
 import Alert from '@material-ui/lab/Alert';
 import Snackbar from '@material-ui/core/Snackbar';
 
-export default function(props) {
+export default function SnackbarPopup(props) {
   const open = useSelector(selectSnackOpen);
   const severity = useSelector(selectSnackSeverity);
   const message = useSelector(selectSnackMessage);

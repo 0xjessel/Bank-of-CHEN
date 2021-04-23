@@ -6,19 +6,26 @@ import MetaMaskOnboarding from '@metamask/onboarding';
 import Web3 from 'web3';
 
 import './css/App.css';
-import { ACTIONS, isMetaMaskInstalled } from './utils'
+import { ACTIONS, isMetaMaskInstalled } from './utils';
 
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
-import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
+import BurnForm from './ui/BurnForm';
 import CHENTextField from './ui/CHENTextField';
+import MintForm from './ui/MintForm';
 import MyBalanceCounter from './ui/MyBalanceCounter';
 import SnackbarPopup from './ui/SnackbarPopup';
 import TotalTokenSupplyCounter from './ui/TotalTokenSupplyCounter';
+import TransferForm from './ui/TransferForm';
 import PrinterDialog from './ui/PrinterDialog';
-import SwapHorizRoundedIcon from '@material-ui/icons/SwapHorizRounded';
 import TransactionsTable from './ui/TransactionsTable';
 
+import {
+  setAddress,
+  getAddress,
+  setDecimals,
+  getDecimals,
+} from './store/accountSlice';
 import { prependRow } from './store/transactionsSlice';
 import { openSnack, closeSnack } from './store/snackSlice';
 import { turnOnPrinter, turnOffPrinter, turnOffPrinterAsync } from './store/printerSlice';
@@ -32,15 +39,11 @@ function App() {
   const onboarding = React.useRef();
   const dispatch = useDispatch();
 
+  const accountAddress = useSelector(getAddress);
+  const decimals = useSelector(getDecimals);
+
   const [initialized, setInitialized] = useState(false);
   const [CHENDollasContract, setCHENDollasContract] = useState();
-  const [accountAddress, setAccountAddress] = useState('0x0');
-  const [decimals, setDecimals] = useState(18);
-
-  const [mintNumber, setMintNumber] = useState(0);
-  const [burnNumber, setBurnNumber] = useState(0);
-  const [transferAddress, setTransferAddress] = useState('0x0');
-  const [transferAmount, setTransferAmount] = useState(0);
 
   async function init() {
     if (isMetaMaskInstalled()) {
@@ -49,10 +52,9 @@ function App() {
       Contract = await Contract.deployed();
       setCHENDollasContract(Contract);
 
-      setDecimals(
-        (await Contract.decimals()),
-        fetchTotalSupply(Contract),
-      );
+      const d = (await Contract.decimals()).toNumber();
+      dispatch(setDecimals(d));
+      fetchTotalSupply(Contract);
     }
 
     setInitialized(true);
@@ -63,9 +65,12 @@ function App() {
       onboarding.current = new MetaMaskOnboarding();
     }
 
-    init();
+    if (!initialized) {
+      init();
+      return;
+    }
 
-    if (!initialized || !isMetaMaskInstalled()) {
+    if (!isMetaMaskInstalled()) {
       return;
     }
 
@@ -127,9 +132,12 @@ function App() {
     }
 
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    setAccountAddress(accounts[0]);
+    dispatch(setAddress(accounts[0]));
 
-    window.ethereum.on('accountsChanged', (accounts) => setAccountAddress(accounts[0]));
+    window.ethereum.on(
+      'accountsChanged',
+      (accounts) => dispatch(setAddress(accounts[0]))
+    );
 
     return accounts[0];
   }
@@ -207,11 +215,41 @@ function App() {
     await updatePage();
   }
 
-  const handleBurn = async (e) => {
-    e.preventDefault();
+  const handleMint = async (value) => {
     try {
-      const convertedBurnNumber = new BN(burnNumber).mul(new BN((10 ** decimals).toString()));
-      const result = await CHENDollasContract.burn(convertedBurnNumber, {from: accountAddress});
+      const convertedMintNumber = new BN(value)
+        .mul(new BN((10 ** decimals).toString()));
+      const result = await CHENDollasContract.mint(
+        accountAddress,
+        convertedMintNumber.toString(),
+        { from: accountAddress }
+      );
+      if (result.receipt.status) {
+        dispatch(openSnack({
+          'open': true,
+          'severity': 'success',
+          'message': 'Successful mint!',
+        }));
+      }
+    } catch (e) {
+      dispatch(openSnack({
+        'open': true,
+        'severity': 'error',
+        'message': e.message,
+      }));
+    }
+
+    await updatePage();
+  }
+
+  const handleBurn = async (value) => {
+    try {
+      const convertedBurnNumber = new BN(value)
+        .mul(new BN((10 ** decimals).toString()));
+      const result = await CHENDollasContract.burn(
+        convertedBurnNumber,
+        {from: accountAddress},
+      );
       if (result.receipt.status) {
         dispatch(openSnack({
           'open': true,
@@ -230,36 +268,32 @@ function App() {
     await updatePage();
   }
 
-  const handleMint = async (e) => {
-    e.preventDefault();
+  const handleTransfer = async (payload) => {
     try {
-      const convertedMintNumber = new BN(mintNumber).mul(new BN((10 ** decimals).toString()));
-      const result = await CHENDollasContract.mint(accountAddress, convertedMintNumber.toString(), { from: accountAddress });
+      const dest = payload.address;
+      const amount = payload.amount;
+
+      const convertedTransferAmount = new BN(amount)
+        .mul(new BN((10 ** decimals).toString()));
+      const result = await CHENDollasContract.transfer(
+        dest,
+        convertedTransferAmount.toString(),
+        {from: accountAddress},
+      );
+
       if (result.receipt.status) {
         dispatch(openSnack({
           'open': true,
           'severity': 'success',
-          'message': 'Successful mint!',
+          'message': 'Successful transfer!',
         }));
       }
     } catch (e) {
-      openSnack('error', e.message);
-    }
-
-    await updatePage();
-  }
-
-  const handleTransfer = async (e) => {
-    e.preventDefault();
-    try {
-      const convertedTransferAmount = new BN(transferAmount).mul(new BN((10 ** decimals).toString()));
-      const result = await CHENDollasContract.transfer(transferAddress, convertedTransferAmount.toString(), {from: accountAddress});
-
-      if (result.receipt.status) {
-        openSnack('success', 'Successful transfer!');
-      }
-    } catch (e) {
-      openSnack('error', e.message);
+      dispatch(openSnack({
+        'open': true,
+        'severity': 'error',
+        'message': e.message,
+      }));
     }
 
     await updatePage();
@@ -295,60 +329,9 @@ function App() {
       <PrinterDialog
         handleCloseDialog={() => dispatch(turnOffPrinter())}
       />
-      <form className="mint_form" onSubmit={handleMint}>
-        <CHENTextField
-          label="Mint New Tokens"
-          value={mintNumber}
-          onChange={ e => setMintNumber(e.target.value) }
-        />
-        <Button
-          className="submit_button"
-          type="submit"
-          variant="contained"
-          color="primary"
-          size="small"
-          endIcon={<AddIcon />}>
-          Mint
-        </Button>
-      </form>
-      <form className="burn_form" onSubmit={handleBurn}>
-        <CHENTextField
-          label="Burn Tokens"
-          value={burnNumber}
-          onChange={ e => setBurnNumber(e.target.value) }
-        />
-        <Button
-          className="submit_button"
-          type="submit"
-          variant="contained"
-          color="primary"
-          size="small">
-          Burn  &nbsp; 🔥
-        </Button>
-      </form>
-      <form className="transfer_form" onSubmit={handleTransfer}>
-        <CHENTextField
-          className="transfer_address_input"
-          label="Transfer Address"
-          value={transferAddress}
-          onChange={ e => setTransferAddress(e.target.value) }
-        />
-        <CHENTextField
-          className="transfer_amount_input"
-          label="Amount"
-          value={transferAmount}
-          onChange={ e => setTransferAmount(e.target.value) }
-        />
-        <Button
-          className="submit_button"
-          type="submit"
-          variant="contained"
-          color="primary"
-          size="small"
-          endIcon={<SwapHorizRoundedIcon />}>
-          Transfer
-        </Button>
-      </form>
+      <MintForm onSubmit={handleMint} />
+      <BurnForm onSubmit={handleBurn} />
+      <TransferForm onSubmit={handleTransfer} />
       <MyBalanceCounter />
       <TotalTokenSupplyCounter />
       <TransactionsTable />

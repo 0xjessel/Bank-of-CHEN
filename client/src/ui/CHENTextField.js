@@ -3,14 +3,19 @@ import React from 'react';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import TextField from '@material-ui/core/TextField';
 
-export default function(props) {
+export default function CHENTextField(props) {
+  const { isCurrency, ...otherProps } = props;
+
   return (
     <TextField
-      {...props}
+      {...otherProps}
       variant="outlined"
       size="small"
+      type={isCurrency ? "number" : undefined}
       InputProps={{
-        endAdornment: <InputAdornment position="start">陈CHEN</InputAdornment>,
+        endAdornment: isCurrency ?
+          <InputAdornment position="start">陈CHEN</InputAdornment> :
+          undefined,
       }}
     />
   );

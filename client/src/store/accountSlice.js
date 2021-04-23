@@ -21,6 +21,7 @@ export const {
   setDecimals,
 } = accountSlice.actions;
 
-export const selectDecimals = state => state.account.decimals;
+export const getDecimals = state => state.account.decimals;
+export const getAddress = state => state.account.address;
 
 export default accountSlice.reducer;
