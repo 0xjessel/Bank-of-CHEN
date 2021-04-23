@@ -11,7 +11,6 @@ import { ACTIONS, isMetaMaskInstalled } from './utils';
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import Button from '@material-ui/core/Button';
 import BurnForm from './ui/BurnForm';
-import CHENTextField from './ui/CHENTextField';
 import MintForm from './ui/MintForm';
 import MyBalanceCounter from './ui/MyBalanceCounter';
 import SnackbarPopup from './ui/SnackbarPopup';
@@ -329,9 +328,18 @@ function App() {
       <PrinterDialog
         handleCloseDialog={() => dispatch(turnOffPrinter())}
       />
-      <MintForm onSubmit={handleMint} />
-      <BurnForm onSubmit={handleBurn} />
-      <TransferForm onSubmit={handleTransfer} />
+      <MintForm
+        className="mint_form"
+        onSubmit={handleMint}
+      />
+      <BurnForm
+        className="burn_form"
+        onSubmit={handleBurn}
+      />
+      <TransferForm
+        className="transfer_form"
+        onSubmit={handleTransfer}
+      />
       <MyBalanceCounter />
       <TotalTokenSupplyCounter />
       <TransactionsTable />

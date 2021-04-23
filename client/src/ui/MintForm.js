@@ -6,13 +6,15 @@ import CHENTextField from './CHENTextField';
 
 export default function MintForm(props) {
   const [value, setValue] = useState(0);
+  const { onSubmit, ...otherProps} = props;
 
   return (
     <form
+      {...otherProps}
       className="mint_form"
       onSubmit={(e) => {
         e.preventDefault();
-        props.onSubmit(value);
+        onSubmit(value);
       }}>
       <CHENTextField
         label="Mint New Tokens"

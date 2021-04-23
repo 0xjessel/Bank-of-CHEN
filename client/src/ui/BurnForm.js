@@ -5,13 +5,14 @@ import CHENTextField from './CHENTextField';
 
 export default function BurnForm(props) {
   const [value, setValue] = useState(0);
+  const { onSubmit, ...otherProps} = props;
 
   return (
     <form
-      className="burn_form"
+      {...otherProps}
       onSubmit={(e) => {
         e.preventDefault();
-        props.onSubmit(value);
+        onSubmit(value);
       }}>
       <CHENTextField
         label="Burn Tokens"

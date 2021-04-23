@@ -7,13 +7,14 @@ import SwapHorizRoundedIcon from '@material-ui/icons/SwapHorizRounded';
 export default function TransferForm(props) {
   const [transferAddress, setTransferAddress] = useState('0x0');
   const [transferAmount, setTransferAmount] = useState(0);
+  const { onSubmit, ...otherProps} = props;
 
   return (
     <form
-      className="transfer_form"
+      {...otherProps}
       onSubmit={(e) => {
         e.preventDefault();
-        props.onSubmit({
+        onSubmit({
           'address': transferAddress,
           'amount': transferAmount,
         });
