@@ -4,13 +4,12 @@ export const transactionsSlice = createSlice({
   name: 'transactions',
   initialState: {
     rows: [],
-    maxRows: 10,
   },
   reducers: {
     prependRow: (state, action) => {
       state.rows = [action.payload, ...state.rows].sort(
         (x, y) => y.timestamp - x.timestamp
-      ).slice(0, state.maxRows);
+      );
     },
   }
 });

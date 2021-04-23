@@ -11,8 +11,7 @@ import { ACTIONS, isMetaMaskInstalled } from './utils';
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import Button from '@material-ui/core/Button';
 import BurnForm from './ui/BurnForm';
-import MintForm from './ui/MintForm';
-import MyBalanceCounter from './ui/MyBalanceCounter';
+import MintForm from './ui/MintForm'; import MyBalanceCounter from './ui/MyBalanceCounter';
 import SnackbarPopup from './ui/SnackbarPopup';
 import TotalTokenSupplyCounter from './ui/TotalTokenSupplyCounter';
 import TransferForm from './ui/TransferForm';
@@ -24,6 +23,8 @@ import {
   getAddress,
   setDecimals,
   getDecimals,
+  setLatestBlockNum,
+  getLatestBlockNum,
 } from './store/accountSlice';
 import { prependRow } from './store/transactionsSlice';
 import { openSnack, closeSnack } from './store/snackSlice';
@@ -40,6 +41,7 @@ function App() {
 
   const accountAddress = useSelector(getAddress);
   const decimals = useSelector(getDecimals);
+  const latestBlockNum = useSelector(getLatestBlockNum);
 
   const [initialized, setInitialized] = useState(false);
   const [CHENDollasContract, setCHENDollasContract] = useState();
@@ -54,6 +56,10 @@ function App() {
       const d = (await Contract.decimals()).toNumber();
       dispatch(setDecimals(d));
       fetchTotalSupply(Contract);
+
+      dispatch(setLatestBlockNum(
+        (await web3.eth.getBlockNumber())
+      ));
     }
 
     setInitialized(true);
@@ -73,12 +79,13 @@ function App() {
       return;
     }
 
+
     CHENDollasContract.Drip({
-      fromBlock: 0, // TODO: don't start from block 0: https://bit.ly/3tuwqW2
+      fromBlock: Math.max(latestBlockNum - 10, 0),
     }).on('data', async (event) => addTableRow(event, ACTIONS.PRINT));
 
     CHENDollasContract.Transfer({
-      fromBlock: 0, // TODO: don't start from block 0
+      fromBlock: Math.max(latestBlockNum - 10, 0),
     }).on('data', async (event) => addTableRow(event, undefined));
 
     async function addTableRow(event, action) {
