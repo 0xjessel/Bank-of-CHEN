@@ -25,6 +25,8 @@ import {
   getDecimals,
   setLatestBlockNum,
   getLatestBlockNum,
+  setIsOwner,
+  getIsOwner,
 } from './store/accountSlice';
 import { prependRow } from './store/transactionsSlice';
 import { openSnack, closeSnack } from './store/snackSlice';
@@ -42,6 +44,7 @@ function App() {
   const accountAddress = useSelector(getAddress);
   const decimals = useSelector(getDecimals);
   const latestBlockNum = useSelector(getLatestBlockNum);
+  const isOwner = useSelector(getIsOwner);
 
   const [initialized, setInitialized] = useState(false);
   const [CHENDollasContract, setCHENDollasContract] = useState();
@@ -138,14 +141,31 @@ function App() {
     }
 
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-    dispatch(setAddress(accounts[0]));
 
     window.ethereum.on(
       'accountsChanged',
-      (accounts) => dispatch(setAddress(accounts[0]))
+      (accounts) => onAccountChange(accounts),
     );
 
+    await onAccountChange(accounts);
+
     return accounts[0];
+  }
+
+  async function onAccountChange(accounts) {
+    if (!accounts || accounts.length < 1) {
+      console.err('no account detected!');
+      return;
+    }
+
+    const address = accounts[0];
+
+    const contractOwner = await CHENDollasContract.owner();
+    dispatch(setIsOwner(
+      contractOwner.toLowerCase() === address.toLowerCase(),
+    ));
+
+    dispatch(setAddress(address));
   }
 
   const updatePage = async (localAccount) => {
@@ -335,10 +355,13 @@ function App() {
       <PrinterDialog
         handleCloseDialog={() => dispatch(turnOffPrinter())}
       />
-      <MintForm
-        className="mint_form"
-        onSubmit={handleMint}
-      />
+      {isOwner ?
+        <MintForm
+          className="mint_form"
+          onSubmit={handleMint}
+        /> :
+        undefined
+      }
       <BurnForm
         className="burn_form"
         onSubmit={handleBurn}
