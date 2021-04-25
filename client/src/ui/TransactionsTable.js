@@ -36,7 +36,7 @@ export default function TransactionsTable() {
                 <Link
                   color="textPrimary"
                   underline="none"
-                  href={'https://ropsten.etherscan.io/address/'+row.address}
+                  href={`https://ropsten.etherscan.io/address/${row.address}`}
                   target="_blank">
                   {row.address}
                 </Link>

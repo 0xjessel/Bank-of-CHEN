@@ -11,6 +11,7 @@ import { ACTIONS, isMetaMaskInstalled } from './utils';
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import Button from '@material-ui/core/Button';
 import BurnForm from './ui/BurnForm';
+import Link from '@material-ui/core/Link';
 import MintForm from './ui/MintForm'; import MyBalanceCounter from './ui/MyBalanceCounter';
 import SnackbarPopup from './ui/SnackbarPopup';
 import TotalTokenSupplyCounter from './ui/TotalTokenSupplyCounter';
@@ -82,7 +83,6 @@ function App() {
       return;
     }
 
-
     CHENDollasContract.Drip({
       fromBlock: Math.max(latestBlockNum - 10, 0),
     }).on('data', async (event) => addTableRow(event, ACTIONS.PRINT));
@@ -141,13 +141,12 @@ function App() {
     }
 
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    await onAccountChange(accounts);
 
     window.ethereum.on(
       'accountsChanged',
       (accounts) => onAccountChange(accounts),
     );
-
-    await onAccountChange(accounts);
 
     return accounts[0];
   }
@@ -168,7 +167,7 @@ function App() {
     dispatch(setAddress(address));
   }
 
-  const updatePage = async (localAccount) => {
+  async function updatePage(localAccount) {
     try {
       const account = localAccount ?? accountAddress;
       const currentBalance = await CHENDollasContract.balanceOf(account);
@@ -224,6 +223,24 @@ function App() {
     try {
       const result = await CHENDollasContract.drip({
         from: accountAddress,
+      }).on('transactionHash', (hash) => {
+        const message =
+          <React.Fragment>
+            Please wait a few seconds to warm up the printer...your transaction hash is{' '}
+            <Link
+              color="textPrimary"
+              href={`https://ropsten.etherscan.io/tx/${hash}`}
+              target="_blank">
+              {hash}
+            </Link>
+          </React.Fragment>;
+
+        dispatch(openSnack({
+          'open': true,
+          'severity': 'info',
+          'message': message,
+          'autoHide': true,
+        }));
       });
 
       if (result.receipt.status) {
@@ -249,7 +266,26 @@ function App() {
         accountAddress,
         convertedMintNumber.toString(),
         { from: accountAddress }
-      );
+      ).on('transactionHash', (hash) => {
+        const message =
+          <React.Fragment>
+            Please wait a few seconds to process...your transaction hash is{' '}
+            <Link
+              color="textPrimary"
+              href={`https://ropsten.etherscan.io/tx/${hash}`}
+              target="_blank">
+              {hash}
+            </Link>
+          </React.Fragment>;
+
+        dispatch(openSnack({
+          'open': true,
+          'severity': 'info',
+          'message': message,
+          'autoHide': false,
+        }));
+      });
+
       if (result.receipt.status) {
         dispatch(openSnack({
           'open': true,
@@ -270,13 +306,34 @@ function App() {
 
   const handleBurn = async (value) => {
     try {
+
       const convertedBurnNumber = new BN(value)
         .mul(new BN((10 ** decimals).toString()));
       const result = await CHENDollasContract.burn(
         convertedBurnNumber,
         {from: accountAddress},
-      );
+      ).on('transactionHash', (hash) => {
+        const message =
+          <React.Fragment>
+            Please wait a few seconds to process...your transaction hash is{' '}
+            <Link
+              color="textPrimary"
+              href={`https://ropsten.etherscan.io/tx/${hash}`}
+              target="_blank">
+              {hash}
+            </Link>
+          </React.Fragment>;
+
+        dispatch(openSnack({
+          'open': true,
+          'severity': 'info',
+          'message': message,
+          'autoHide': false,
+        }));
+      });
+
       if (result.receipt.status) {
+        // TODO: add link to transaction hash here
         dispatch(openSnack({
           'open': true,
           'severity': 'success',
@@ -305,7 +362,25 @@ function App() {
         dest,
         convertedTransferAmount.toString(),
         {from: accountAddress},
-      );
+      ).on('transactionHash', (hash) => {
+        const message =
+          <React.Fragment>
+            Please wait a few seconds to process...your transaction hash is{' '}
+            <Link
+              color="textPrimary"
+              href={`https://ropsten.etherscan.io/tx/${hash}`}
+              target="_blank">
+              {hash}
+            </Link>
+          </React.Fragment>;
+
+        dispatch(openSnack({
+          'open': true,
+          'severity': 'info',
+          'message': message,
+          'autoHide': false,
+        }));
+      });
 
       if (result.receipt.status) {
         dispatch(openSnack({

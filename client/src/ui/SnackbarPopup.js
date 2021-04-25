@@ -4,6 +4,7 @@ import {
   selectSnackOpen,
   selectSnackSeverity,
   selectSnackMessage,
+  selectSnackAutoHide,
 } from '../store/snackSlice';
 
 import Alert from '@material-ui/lab/Alert';
@@ -13,11 +14,17 @@ export default function SnackbarPopup(props) {
   const open = useSelector(selectSnackOpen);
   const severity = useSelector(selectSnackSeverity);
   const message = useSelector(selectSnackMessage);
+  const autoHide = useSelector(selectSnackAutoHide);
+
+  const progressStyle = {
+    marginLeft: '8px',
+    verticalAlign: 'text-top',
+  };
 
   return (
     <Snackbar
       open={open}
-      autoHideDuration={5000}
+      autoHideDuration={autoHide ? 5000 : undefined}
       onClose={props.onClose}>
       <Alert
         elevation={6}
