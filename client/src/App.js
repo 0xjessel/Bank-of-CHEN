@@ -84,11 +84,11 @@ function App() {
     }
 
     CHENDollasContract.Drip({
-      fromBlock: Math.max(latestBlockNum - 10, 0),
+      fromBlock: Math.max(latestBlockNum - 1000, 0),
     }).on('data', async (event) => addTableRow(event, ACTIONS.PRINT));
 
     CHENDollasContract.Transfer({
-      fromBlock: Math.max(latestBlockNum - 10, 0),
+      fromBlock: Math.max(latestBlockNum - 1000, 0),
     }).on('data', async (event) => addTableRow(event, undefined));
 
     async function addTableRow(event, action) {
