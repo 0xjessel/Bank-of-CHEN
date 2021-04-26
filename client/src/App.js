@@ -223,7 +223,7 @@ function App() {
     try {
       const result = await CHENDollasContract.drip({
         from: accountAddress,
-      }).on('transactionHash', (hash) => {
+      }).once('transactionHash', (hash) => {
         const message =
           <React.Fragment>
             Please wait a few seconds to warm up the printer...your transaction hash is{' '}
@@ -266,7 +266,7 @@ function App() {
         accountAddress,
         convertedMintNumber.toString(),
         { from: accountAddress }
-      ).on('transactionHash', (hash) => {
+      ).once('transactionHash', (hash) => {
         const message =
           <React.Fragment>
             Please wait a few seconds to process...your transaction hash is{' '}
@@ -312,7 +312,7 @@ function App() {
       const result = await CHENDollasContract.burn(
         convertedBurnNumber,
         {from: accountAddress},
-      ).on('transactionHash', (hash) => {
+      ).once('transactionHash', (hash) => {
         const message =
           <React.Fragment>
             Please wait a few seconds to process...your transaction hash is{' '}
@@ -362,7 +362,7 @@ function App() {
         dest,
         convertedTransferAmount.toString(),
         {from: accountAddress},
-      ).on('transactionHash', (hash) => {
+      ).once('transactionHash', (hash) => {
         const message =
           <React.Fragment>
             Please wait a few seconds to process...your transaction hash is{' '}
