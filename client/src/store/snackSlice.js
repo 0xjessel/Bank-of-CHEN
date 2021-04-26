@@ -17,9 +17,6 @@ export const snackSlice = createSlice({
     },
     closeSnack: state => {
       state.open = false;
-      state.severity = undefined;
-      state.message = '';
-      state.autoHide = true;
     }
   }
 });
