@@ -6,7 +6,7 @@ import MetaMaskOnboarding from '@metamask/onboarding';
 import Web3 from 'web3';
 
 import './css/App.css';
-import { ACTIONS, isMetaMaskInstalled } from './utils';
+import { ACTIONS, isMetaMaskInstalled, zeroAddress } from './utils';
 
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import Button from '@material-ui/core/Button';
@@ -70,6 +70,14 @@ function App() {
   }
 
   useEffect(() => {
+    if (!initialized) {
+      return;
+    }
+
+    updatePage();
+  }, [accountAddress]);
+
+  useEffect(() => {
     if (!onboarding.current) {
       onboarding.current = new MetaMaskOnboarding();
     }
@@ -92,7 +100,6 @@ function App() {
     }).on('data', async (event) => addTableRow(event, undefined));
 
     async function addTableRow(event, action) {
-      const zeroAddress = '0x0000000000000000000000000000000000000000';
       let address;
 
       let {
@@ -133,7 +140,7 @@ function App() {
     };
   }, [initialized]);
 
-  const getAccount = async () => {
+  async function getAccount() {
     const ethereum = window.ethereum;
     if (ethereum === undefined) {
       console.error('window.ethereum is undefined!');
@@ -183,15 +190,7 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    if (!initialized) {
-      return;
-    }
-
-    updatePage();
-  }, [accountAddress]);
-
-  const fetchTotalSupply = async (LocalContract) => {
+  async function fetchTotalSupply(LocalContract) {
     const Contract = LocalContract ?? CHENDollasContract;
     const totalSupply = await Contract.totalSupply();
     dispatch(setTokenSupply(totalSupply / (10 ** decimals)));

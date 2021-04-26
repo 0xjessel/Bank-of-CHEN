@@ -16,11 +16,6 @@ export default function SnackbarPopup(props) {
   const message = useSelector(selectSnackMessage);
   const autoHide = useSelector(selectSnackAutoHide);
 
-  const progressStyle = {
-    marginLeft: '8px',
-    verticalAlign: 'text-top',
-  };
-
   return (
     <Snackbar
       open={open}
