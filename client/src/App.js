@@ -12,7 +12,8 @@ import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceW
 import Button from '@material-ui/core/Button';
 import BurnForm from './ui/BurnForm';
 import Link from '@material-ui/core/Link';
-import MintForm from './ui/MintForm'; import MyBalanceCounter from './ui/MyBalanceCounter';
+import MintForm from './ui/MintForm';
+import MyBalanceCounter from './ui/MyBalanceCounter';
 import SnackbarPopup from './ui/SnackbarPopup';
 import TotalTokenSupplyCounter from './ui/TotalTokenSupplyCounter';
 import TransferForm from './ui/TransferForm';
@@ -75,6 +76,7 @@ function App() {
     }
 
     updatePage();
+  // eslint-disable-next-line
   }, [accountAddress]);
 
   useEffect(() => {
@@ -138,6 +140,7 @@ function App() {
     return () => {
       web3.eth.clearSubscriptions();
     };
+  // eslint-disable-next-line
   }, [initialized]);
 
   async function getAccount() {
