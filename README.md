@@ -10,8 +10,9 @@ I built this to experiment with ERC20 Tokens and Dapps.  Maybe also secretly hop
 
 ## Directions
 1. Download the Metamask Chrome extension.  Where it says "Ethereum Mainnet", click on it and toggle to "Ropsten Test Network"
-2. Go to {website_url}
-3. Click "Connect Wallet"
+2. Find a Ropsten faucet (e.g. https://faucet.ropsten.be/) and get some test ETH
+3. Go to {website_url}
+4. Click "Connect Wallet" to get started
 
 ## Screenshot
 ![image](https://user-images.githubusercontent.com/394218/129458435-92dabb03-09ac-470f-997b-92179eea97b7.png)
@@ -21,3 +22,9 @@ I built this to experiment with ERC20 Tokens and Dapps.  Maybe also secretly hop
 A HUGE source of help to get me started: https://medium.com/fullstacked/connect-react-to-ethereum-b117986d56c1
 
 Currently, it is deployed to the Ropsten network.  I've only tested this on Chrome and with the Metamask extension, other setups might not work.  Built with Truffle, Material UI, and React.js
+
+To build the blockchain contracts, `npm run install` in `blockchain/` and `truffle develop` and then `migrate` to set up a local testnet.  To deploy onto the blockchain, `truffle deploy --network ropsten`
+
+To build the React app, `npm run install` in `client/` and then `npm run start`
+
+
