@@ -25,6 +25,6 @@ Currently, it is deployed to the Ropsten network.  I've only tested this on Chro
 
 To build the blockchain contracts, `npm run install` in `blockchain/` and `truffle develop` and then `migrate` to set up a local testnet.  To deploy onto the blockchain, `truffle deploy --network ropsten`
 
-To build the React app, `npm run install` in `client/` and then `npm run start`
+To build the React app, `npm run install` in `client/` and then `npm run start`.  You'll also need to `cp blockchain/build/contracts/CHENDollas.json client/src/build/contracts/CHENDollas.json` to let `TruffleContract` read the contract's ABI.  
 
-
+To test the app, configure your Metamask to connect to the local truffle testnet and import the private key of the account truffle created (for admin privileges).  
