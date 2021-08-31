@@ -4,6 +4,7 @@ import TruffleContract from '@truffle/contract';
 import CHENDollas from './build/contracts/CHENDollas.json';
 import MetaMaskOnboarding from '@metamask/onboarding';
 import Web3 from 'web3';
+import ENS, { getEnsAddress } from '@ensdomains/ensjs';
 
 import './css/App.css';
 import { ACTIONS, isMetaMaskInstalled, zeroAddress } from './utils';
@@ -29,6 +30,8 @@ import {
   getLatestBlockNum,
   setIsOwner,
   getIsOwner,
+  setName,
+  getName,
 } from './store/accountSlice';
 import { prependRow } from './store/transactionsSlice';
 import { openSnack, closeSnack } from './store/snackSlice';
@@ -36,14 +39,17 @@ import { turnOnPrinter, turnOffPrinter, turnOffPrinterAsync } from './store/prin
 import { setTokenSupply } from './store/tokenSupplySlice';
 import { setCurrentBalance } from './store/currentBalanceSlice';
 
-const web3 = new Web3(Web3.givenProvider);
+const provider = Web3.givenProvider;
+const web3 = new Web3(provider);
 const BN = web3.utils.BN;
+const ens = new ENS({ provider, ensAddress: getEnsAddress('1') });
 
 function App() {
   const onboarding = React.useRef();
   const dispatch = useDispatch();
 
   const accountAddress = useSelector(getAddress);
+  const accountName = useSelector(getName);
   const decimals = useSelector(getDecimals);
   const latestBlockNum = useSelector(getLatestBlockNum);
   const isOwner = useSelector(getIsOwner);
@@ -54,7 +60,7 @@ function App() {
   async function init() {
     if (isMetaMaskInstalled()) {
       let Contract = TruffleContract(CHENDollas);
-      Contract.setProvider(web3.givenProvider);
+      Contract.setProvider(provider);
       Contract = await Contract.deployed();
       setCHENDollasContract(Contract);
 
@@ -174,7 +180,10 @@ function App() {
       contractOwner.toLowerCase() === address.toLowerCase(),
     ));
 
+    const name = await ens.getName(address);
+
     dispatch(setAddress(address));
+    dispatch(setName(name.name));
   }
 
   async function updatePage(localAccount) {
@@ -420,7 +429,7 @@ function App() {
         />
       </Button>
       <span className="account_address">
-        My address: { accountAddress }
+        My address: { accountName ?? accountAddress }
       </span>
       <Button
         className="drip_button"

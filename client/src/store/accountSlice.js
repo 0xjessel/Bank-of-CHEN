@@ -7,6 +7,7 @@ export const accountSlice = createSlice({
     decimals: 18,
     isOwner: false,
     latestBlockNum: 0,
+    name: null,
   },
   reducers: {
     setAddress: (state, action) => {
@@ -21,6 +22,9 @@ export const accountSlice = createSlice({
     setIsOwner: (state, action) => {
       state.isOwner = action.payload;
     },
+    setName: (state, action) => {
+      state.name = action.payload;
+    },
   }
 });
 
@@ -29,11 +33,13 @@ export const {
   setDecimals,
   setLatestBlockNum,
   setIsOwner,
+  setName,
 } = accountSlice.actions;
 
 export const getDecimals = state => state.account.decimals;
 export const getAddress = state => state.account.address;
 export const getLatestBlockNum = state => state.account.latestBlockNum;
 export const getIsOwner = state => state.account.isOwner;
+export const getName = state => state.account.name;
 
 export default accountSlice.reducer;
