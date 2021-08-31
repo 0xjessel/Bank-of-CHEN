@@ -427,7 +427,7 @@ function App() {
         style={{backgroundColor: '#4caf50', color: '#FFFFFF'}}
         variant="outlined"
         onClick={handleDrip}>
-        Print &nbsp;💸
+        Print 💸
       </Button>
       <PrinterDialog
         handleCloseDialog={() => dispatch(turnOffPrinter())}
