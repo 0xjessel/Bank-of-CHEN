@@ -5,7 +5,7 @@ import CHENTextField from './CHENTextField';
 
 export default function BurnForm(props) {
   const [value, setValue] = useState(0);
-  const { onSubmit, ...otherProps} = props;
+  const {onSubmit, ...otherProps} = props;
 
   return (
     <form
