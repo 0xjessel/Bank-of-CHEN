@@ -45,8 +45,7 @@ import { setTokenSupply } from './store/tokenSupplySlice';
 import { setCurrentBalance } from './store/currentBalanceSlice';
 import { showNUX } from './store/NUXDialogSlice';
 
-const provider = Web3.givenProvider;
-const web3 = new Web3(provider);
+const web3 = new Web3(Web3.givenProvider);
 const BN = web3.utils.BN;
 let ens;
 
@@ -73,7 +72,7 @@ function App() {
 
     if (hasMM && onCorrectNetwork) {
       let Contract = TruffleContract(CHENDollas);
-      Contract.setProvider(provider);
+      Contract.setProvider(Web3.givenProvider);
       Contract = await Contract.deployed();
       setCHENDollasContract(Contract);
 
@@ -85,7 +84,10 @@ function App() {
         (await web3.eth.getBlockNumber())
       ));
 
-      ens = new ENS({ provider, ensAddress: getEnsAddress('1') });
+      ens = new ENS({
+        provider: Web3.givenProvider,
+        ensAddress: getEnsAddress('1'),
+      });
     } else {
       dispatch(showNUX());
     }
