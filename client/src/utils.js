@@ -3,6 +3,15 @@ export function isMetaMaskInstalled() {
   return Boolean(ethereum && ethereum.isMetaMask);
 }
 
+export async function isRopstenNetwork() {
+  if (!isMetaMaskInstalled()) {
+    return false;
+  }
+
+  const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+  return chainId === '0x3';
+}
+
 export const ACTIONS = {
   PRINT: 'Print 💸',
   MINT: 'Mint ＋',

@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import TruffleContract from '@truffle/contract';
 import CHENDollas from './build/contracts/CHENDollas.json';
-import MetaMaskOnboarding from '@metamask/onboarding';
 import Web3 from 'web3';
 import ENS, { getEnsAddress } from '@ensdomains/ensjs';
 
 import './css/App.css';
-import { ACTIONS, isMetaMaskInstalled, zeroAddress } from './utils';
+import { ACTIONS, isMetaMaskInstalled, isRopstenNetwork, zeroAddress } from './utils';
 
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import AddTokenIcon from './ui/AddTokenIcon';
@@ -16,6 +15,7 @@ import BurnForm from './ui/BurnForm';
 import Link from '@material-ui/core/Link';
 import MintForm from './ui/MintForm';
 import MyBalanceCounter from './ui/MyBalanceCounter';
+import NUXDialog from './ui/NUXDialog';
 import SnackbarPopup from './ui/SnackbarPopup';
 import TotalTokenSupplyCounter from './ui/TotalTokenSupplyCounter';
 import TransferForm from './ui/TransferForm';
@@ -33,20 +33,24 @@ import {
   getIsOwner,
   setName,
   getName,
+  getIsRopsten,
+  setIsRopsten,
+  getHasMetaMask,
+  setHasMetaMask,
 } from './store/accountSlice';
 import { prependRow } from './store/transactionsSlice';
 import { openSnack, closeSnack } from './store/snackSlice';
 import { turnOnPrinter, turnOffPrinter, turnOffPrinterAsync } from './store/printerSlice';
 import { setTokenSupply } from './store/tokenSupplySlice';
 import { setCurrentBalance } from './store/currentBalanceSlice';
+import { showNUX } from './store/NUXDialogSlice';
 
 const provider = Web3.givenProvider;
 const web3 = new Web3(provider);
 const BN = web3.utils.BN;
-const ens = new ENS({ provider, ensAddress: getEnsAddress('1') });
+let ens;
 
 function App() {
-  const onboarding = React.useRef();
   const dispatch = useDispatch();
 
   const accountAddress = useSelector(getAddress);
@@ -54,12 +58,20 @@ function App() {
   const decimals = useSelector(getDecimals);
   const latestBlockNum = useSelector(getLatestBlockNum);
   const isOwner = useSelector(getIsOwner);
+  const isRopsten = useSelector(getIsRopsten);
+  const hasMetaMask = useSelector(getHasMetaMask);
 
   const [initialized, setInitialized] = useState(false);
   const [CHENDollasContract, setCHENDollasContract] = useState();
 
   async function init() {
-    if (isMetaMaskInstalled()) {
+    const hasMM = isMetaMaskInstalled();
+    const onCorrectNetwork = await isRopstenNetwork();
+
+    dispatch(setHasMetaMask(hasMM));
+    dispatch(setIsRopsten(onCorrectNetwork));
+
+    if (hasMM && onCorrectNetwork) {
       let Contract = TruffleContract(CHENDollas);
       Contract.setProvider(provider);
       Contract = await Contract.deployed();
@@ -72,11 +84,16 @@ function App() {
       dispatch(setLatestBlockNum(
         (await web3.eth.getBlockNumber())
       ));
+
+      ens = new ENS({ provider, ensAddress: getEnsAddress('1') });
+    } else {
+      dispatch(showNUX());
     }
 
     setInitialized(true);
   }
 
+  // update page if account address changes
   useEffect(() => {
     if (!initialized) {
       return;
@@ -86,17 +103,14 @@ function App() {
   // eslint-disable-next-line
   }, [accountAddress]);
 
+  // setup listeners after initialized
   useEffect(() => {
-    if (!onboarding.current) {
-      onboarding.current = new MetaMaskOnboarding();
-    }
-
     if (!initialized) {
       init();
       return;
     }
 
-    if (!isMetaMaskInstalled()) {
+    if (!hasMetaMask || !isRopsten) {
       return;
     }
 
@@ -148,7 +162,7 @@ function App() {
       web3.eth.clearSubscriptions();
     };
   // eslint-disable-next-line
-  }, [initialized]);
+  }, [initialized, isRopsten, hasMetaMask]);
 
   async function getAccount() {
     const ethereum = window.ethereum;
@@ -210,13 +224,6 @@ function App() {
   }
 
   const handleConnect = async (e) => {
-    if (!isMetaMaskInstalled()) {
-      onboarding.current.startOnboarding();
-      return;
-    } else {
-      onboarding.current.stopOnboarding();
-    }
-
     try {
       const account = await getAccount();
 
@@ -318,7 +325,6 @@ function App() {
 
   const handleBurn = async (value) => {
     try {
-
       const convertedBurnNumber = new BN(value)
         .mul(new BN((10 ** decimals).toString()));
       const result = await CHENDollasContract.burn(
@@ -481,6 +487,7 @@ function App() {
       <TotalTokenSupplyCounter />
       <TransactionsTable />
       <SnackbarPopup onClose={() => dispatch(closeSnack())} />
+      <NUXDialog />
     </div>
   );
 }

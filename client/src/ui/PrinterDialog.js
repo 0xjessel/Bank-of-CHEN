@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSelector } from 'react-redux'
+import { useSelector } from 'react-redux';
 import { isPrinterOn } from '../store/printerSlice';
 
 import printer from '../img/money-printer.gif';
