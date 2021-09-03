@@ -3,6 +3,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { isNUXDialogOpen } from '../store/NUXDialogSlice';
 import { getIsRopsten, getHasMetaMask } from '../store/accountSlice';
+import { isChrome, isMobile } from "react-device-detect";
 
 import CancelIcon from '@material-ui/icons/Cancel';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
@@ -37,24 +38,35 @@ export default function NUXDialog(props) {
     onboarding.current.startOnboarding();
   };
 
-  return (
-    <Dialog
-      className="nux_dialog"
-      scroll="body"
-      open={open}>
-      <MuiDialogTitle disableTypography>
-        <Typography variant="h6">
-          Welcome to Bank of 陈CHEN!
+  let dialogContent;
+  if (isMobile) {
+    dialogContent =
+      <MuiDialogContent dividers>
+        <Typography gutterBottom>
+          The Bank is dealing with runaway inflation and cannot afford software engineers to support mobile.
+          Please come back on desktop!
         </Typography>
-      </MuiDialogTitle>
+      </MuiDialogContent>;
+  } else {
+    const chromeDisclaimer = !isChrome
+      ? <li>
+          <Typography gutterBottom>
+            The Bank is only supported on the Chrome browser due to being cheap.
+            Please switch to Chrome!
+          </Typography>
+        </li>
+      : null;
+
+    dialogContent =
       <MuiDialogContent dividers>
         <Typography gutterBottom>
           In order to access the Bank, you must follow the instructions below:
         </Typography>
         <ol>
+          {chromeDisclaimer}
           <li>
             <Typography gutterBottom>
-              Install{' '}
+              Install the{' '}
               <Link
                 color="secondary"
                 href="#"
@@ -93,7 +105,20 @@ export default function NUXDialog(props) {
             />
           </li>
         </ol>
-      </MuiDialogContent>
+      </MuiDialogContent>;
+  }
+
+  return (
+    <Dialog
+      className="nux_dialog"
+      scroll="body"
+      open={open}>
+      <MuiDialogTitle disableTypography>
+        <Typography variant="h6">
+          Welcome to Bank of 陈CHEN!
+        </Typography>
+      </MuiDialogTitle>
+      {dialogContent}
     </Dialog>
   );
 };
