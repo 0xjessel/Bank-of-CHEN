@@ -5,6 +5,7 @@ import { isNUXDialogOpen } from '../store/NUXDialogSlice';
 import { getIsRopsten, getHasMetaMask } from '../store/accountSlice';
 import { isChrome, isMobile } from "react-device-detect";
 
+import Box from '@material-ui/core/Box';
 import CancelIcon from '@material-ui/icons/Cancel';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Dialog from '@material-ui/core/Dialog';
@@ -93,7 +94,7 @@ export default function NUXDialog(props) {
           </li>
           <li>
             <Typography gutterBottom>
-              Switch to Ropsten Network {isRopsten
+              Switch to "Ropsten Test Network" {isRopsten
                 ? <CheckCircleIcon className="status_icon" />
                 : <CancelIcon className="status_icon" />
               }
@@ -105,6 +106,15 @@ export default function NUXDialog(props) {
             />
           </li>
         </ol>
+        <Box fontFamily="Monospace">
+          Or view{' '}
+          <Link
+            color="secondary"
+            href="https://github.com/0xjessel/Bank-of-CHEN">
+            my source code
+          </Link>
+          {' '}instead!
+        </Box>
       </MuiDialogContent>;
   }
 
