@@ -69,7 +69,18 @@ input[type=number] {
   cursor: pointer;
   border: 1px solid gray;
   display: block;
-  position: absolute;
-  top: 20px;
-  right: 16px;
+}
+
+.header {
+  list-style-type: none;
+  margin: 20px 0 0 auto;
+}
+
+.header li {
+  float: left;
+  margin-right: 16px;
+}
+
+.header .github_link {
+  color: white;
 }

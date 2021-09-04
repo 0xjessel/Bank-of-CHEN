@@ -9,9 +9,9 @@ import './css/App.css';
 import { ACTIONS, isMetaMaskInstalled, isRopstenNetwork, zeroAddress } from './utils';
 
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
-import AddTokenIcon from './ui/AddTokenIcon';
 import Button from '@material-ui/core/Button';
 import BurnForm from './ui/BurnForm';
+import Header from './ui/Header';
 import Link from '@material-ui/core/Link';
 import MintForm from './ui/MintForm';
 import MyBalanceCounter from './ui/MyBalanceCounter';
@@ -435,32 +435,13 @@ function App() {
     await updatePage();
   }
 
-  const handleAddToken = async (e) => {
-    if (!window.ethereum) {
-      return;
-    }
-
-    await window.ethereum.request({
-      method: 'wallet_watchAsset',
-      params: {
-        type: 'ERC20',
-        options: {
-          address: '0x6aeca8bf14f37b5d2399d82e93a1e837b8fe86af', // ropsten
-          symbol: '陈CHEN',
-          decimals: 18,
-          image: 'https://bankofchen.vercel.app/logo512.png',
-        },
-      },
-    })
-  }
-
   if (!initialized) {
     return null;
   }
 
   return (
     <div className="App">
-      <AddTokenIcon onClick={handleAddToken} />
+      <Header />
       <h1>Bank of 陈CHEN</h1>
       <Button
         className="connect_wallet"
