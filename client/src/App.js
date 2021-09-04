@@ -244,6 +244,8 @@ function App() {
     try {
       const result = await CHENDollasContract.drip({
         from: accountAddress,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
       }).once('transactionHash', (hash) => {
         const message =
           <React.Fragment>
@@ -286,7 +288,11 @@ function App() {
       const result = await CHENDollasContract.mint(
         accountAddress,
         convertedMintNumber.toString(),
-        { from: accountAddress }
+        {
+          from: accountAddress,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        },
       ).once('transactionHash', (hash) => {
         const message =
           <React.Fragment>
@@ -329,9 +335,14 @@ function App() {
     try {
       const convertedBurnNumber = new BN(value)
         .mul(new BN((10 ** decimals).toString()));
+
       const result = await CHENDollasContract.burn(
         convertedBurnNumber,
-        {from: accountAddress},
+        {
+          from: accountAddress,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        },
       ).once('transactionHash', (hash) => {
         const message =
           <React.Fragment>
@@ -381,7 +392,11 @@ function App() {
       const result = await CHENDollasContract.transfer(
         dest,
         convertedTransferAmount.toString(),
-        {from: accountAddress},
+        {
+          from: accountAddress,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        },
       ).once('transactionHash', (hash) => {
         const message =
           <React.Fragment>
