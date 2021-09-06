@@ -20,7 +20,7 @@ export default function TransferForm(props) {
       transferAmount > currentBalance ||
       !web3.utils.isAddress(transferAddress)
     );
-  }, [currentBalance, transferAmount]);
+  }, [currentBalance, transferAmount, transferAddress, web3.utils]);
 
   return (
     <form
