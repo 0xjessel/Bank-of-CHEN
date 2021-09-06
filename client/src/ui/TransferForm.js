@@ -30,7 +30,7 @@ export default function TransferForm(props) {
       }}>
       <CHENTextField
         className="transfer_address_input"
-        label="Transfer Address"
+        label="Recipient Address"
         value={transferAddress}
         onChange={ e => setTransferAddress(e.target.value) }
       />
