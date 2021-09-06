@@ -1,3 +1,7 @@
 .status_icon {
   vertical-align: middle;
 }
+
+.nux_dialog .divider {
+  margin: 12px 0;
+}

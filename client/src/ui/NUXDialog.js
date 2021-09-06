@@ -9,6 +9,7 @@ import Box from '@material-ui/core/Box';
 import CancelIcon from '@material-ui/icons/Cancel';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import Dialog from '@material-ui/core/Dialog';
+import Divider from '@material-ui/core/Divider';
 import Link from '@material-ui/core/Link';
 import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
@@ -47,6 +48,7 @@ export default function NUXDialog(props) {
           The Bank is dealing with runaway inflation and cannot afford software engineers to support mobile.
           Please come back on desktop!
         </Typography>
+        <Divider className="divider" />
         <Box fontFamily="Monospace">
           Or view{' '}
           <Link
@@ -114,7 +116,11 @@ export default function NUXDialog(props) {
               width="50%"
             />
           </li>
+          <li>
+            Click "Connect Wallet" and then "Print" to get your first 陈CHEN bucks!
+          </li>
         </ol>
+        <Divider className="divider" />
         <Box fontFamily="Monospace">
           Or view{' '}
           <Link
