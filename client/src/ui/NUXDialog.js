@@ -47,6 +47,15 @@ export default function NUXDialog(props) {
           The Bank is dealing with runaway inflation and cannot afford software engineers to support mobile.
           Please come back on desktop!
         </Typography>
+        <Box fontFamily="Monospace">
+          Or view{' '}
+          <Link
+            color="secondary"
+            href="https://github.com/0xjessel/Bank-of-CHEN">
+            my source code
+          </Link>
+          {' '}instead!
+        </Box>
       </MuiDialogContent>;
   } else {
     const chromeDisclaimer = !isChrome
