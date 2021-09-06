@@ -458,8 +458,12 @@ function App() {
       </span>
       <Button
         className="drip_button"
-        style={{backgroundColor: '#4caf50', color: '#FFFFFF'}}
+        style={{
+          backgroundColor: accountAddress === '0x0' ? null : '#4caf50',
+          color: '#FFFFFF',
+        }}
         variant="outlined"
+        disabled={accountAddress === '0x0'}
         onClick={handleDrip}>
         Print 💸
       </Button>
