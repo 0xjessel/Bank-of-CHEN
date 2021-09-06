@@ -12,10 +12,14 @@ export default function TransferForm(props) {
   const [disabled, setDisabled] = useState(false);
   const currentBalance = useSelector(getCurrentBalance);
 
-  const { onSubmit, ...otherProps} = props;
+  const { onSubmit, web3, ...otherProps} = props;
 
   useEffect(() => {
-    setDisabled(currentBalance === 0 || transferAmount > currentBalance);
+    setDisabled(
+      currentBalance === 0 ||
+      transferAmount > currentBalance ||
+      !web3.utils.isAddress(transferAddress)
+    );
   }, [currentBalance, transferAmount]);
 
   return (

@@ -480,6 +480,7 @@ function App() {
       <TransferForm
         className="transfer_form"
         onSubmit={handleTransfer}
+        web3={web3}
       />
       <MyBalanceCounter />
       <TotalTokenSupplyCounter />
