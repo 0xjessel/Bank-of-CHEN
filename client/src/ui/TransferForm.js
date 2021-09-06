@@ -10,13 +10,13 @@ export default function TransferForm(props) {
   const [transferAddress, setTransferAddress] = useState('0x0');
   const [transferAmount, setTransferAmount] = useState(0);
   const [disabled, setDisabled] = useState(false);
-  const count = useSelector(getCurrentBalance);
+  const currentBalance = useSelector(getCurrentBalance);
 
   const { onSubmit, ...otherProps} = props;
 
   useEffect(() => {
-    setDisabled(count === 0);
-  }, [count]);
+    setDisabled(currentBalance === 0 || transferAmount > currentBalance);
+  }, [currentBalance, transferAmount]);
 
   return (
     <form

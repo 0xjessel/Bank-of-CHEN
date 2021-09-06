@@ -8,13 +8,13 @@ import CHENTextField from './CHENTextField';
 export default function BurnForm(props) {
   const [value, setValue] = useState(0);
   const [disabled, setDisabled] = useState(false);
-  const count = useSelector(getCurrentBalance);
+  const currentBalance = useSelector(getCurrentBalance);
 
   const {onSubmit, ...otherProps} = props;
 
   useEffect(() => {
-    setDisabled(count === 0);
-  }, [count]);
+    setDisabled(currentBalance === 0 || value > currentBalance);
+  }, [currentBalance, value]);
 
   return (
     <form
@@ -24,7 +24,7 @@ export default function BurnForm(props) {
         onSubmit(value);
       }}>
       <CHENTextField
-        label="Burn Tokens"
+        label="Amount to burn"
         value={value}
         isCurrency={true}
         onChange={ e => setValue(e.target.value) }
