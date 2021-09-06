@@ -13,7 +13,12 @@ import reportWebVitals from './reportWebVitals';
 const theme = createTheme({
   palette: {
     type: "dark",
-  }
+  },
+  typography: {
+    fontFamily: [
+      'Noto Serif',
+    ],
+  },
 });
 
 ReactDOM.render(
