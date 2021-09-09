@@ -33,7 +33,7 @@ export default function Header(props) {
           <Avatar
             className="add_token"
             alt="Add 陈CHEN Token"
-            src="https://bankofchen.vercel.app/logo512.png"
+            src="/logo512.png"
             onClick={handleAddToken}
           />
         </Tooltip>
