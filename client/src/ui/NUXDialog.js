@@ -96,7 +96,7 @@ export default function NUXDialog(props) {
               Get some{' '}
               <Link
                 color="secondary"
-                href="https://faucet.dimensions.network/"
+                href="https://faucet.ropsten.be/"
                 target="_blank">
                 Ropsten ETH
               </Link>
