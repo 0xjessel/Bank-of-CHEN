@@ -10,12 +10,12 @@ I built this to learn about Ethereum blockchain, ERC20 tokens, and web3.  Also s
 
 ## Instructions
 1. Download the [Metamask Chrome extension](https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn).  Where it says "Ethereum Mainnet", click on it and toggle to "Ropsten Test Network"
-2. Find a [Ropsten faucet](https://faucet.dimensions.network/) and get some Ropsten ETH to pay for gas fees
+2. Find a [Ropsten faucet](https://faucet.ropsten.be/) and get some Ropsten ETH to pay for gas fees
 3. Go to https://bankofchen.vercel.app/
 4. Follow instructions and click "Connect Wallet" to get started
 
 ## Screenshot
-![image](https://user-images.githubusercontent.com/394218/132078534-7f9e1df6-f2bd-480c-b007-3e3cc9e7d18d.png)
+![image](https://user-images.githubusercontent.com/394218/132607409-c77ac42c-7ec8-44ea-9e21-5638b12be0de.png)
 
 ## Technical Details
 
