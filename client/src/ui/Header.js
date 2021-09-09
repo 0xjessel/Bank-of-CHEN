@@ -40,6 +40,19 @@ export default function Header(props) {
       </li>
       <li>
         <Link
+          href="https://faucet.ropsten.be/"
+          target="_blank">
+          <Tooltip title="Get Ropsten ETH">
+            <Avatar
+              className="get_ropsten"
+              alt="Get Ropsten ETH"
+              src="/eth-logo.png"
+            />
+          </Tooltip>
+        </Link>
+      </li>
+      <li>
+        <Link
           className="github_link"
           href="https://github.com/0xjessel/Bank-of-CHEN"
           target="_blank">
