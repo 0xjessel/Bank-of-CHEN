@@ -17,7 +17,7 @@ export default function Header(props) {
       params: {
         type: 'ERC20',
         options: {
-          address: '0x6aeca8bf14f37b5d2399d82e93a1e837b8fe86af', // ropsten
+          address: '0x6D8A0a8b64b9998C2195308F376cA1b6e75DB398', // rinkeby
           symbol: '陈CHEN',
           decimals: 18,
           image: 'https://bankofchen.vercel.app/logo512.png',

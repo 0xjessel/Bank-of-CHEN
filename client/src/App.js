@@ -260,8 +260,8 @@ function App() {
     try {
       const result = await CHENDollasContract.drip({
         from: accountAddress,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
+        maxPriorityFeePerGas: null,
+        maxFeePerGas: null,
       }).once('transactionHash', (hash) => {
         const message =
           <React.Fragment>
