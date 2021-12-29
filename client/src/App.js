@@ -6,7 +6,7 @@ import Web3 from 'web3';
 import ENS, { getEnsAddress } from '@ensdomains/ensjs';
 
 import './css/App.css';
-import { ACTIONS, isMetaMaskInstalled, isRopstenNetwork, zeroAddress } from './utils';
+import { ACTIONS, isMetaMaskInstalled, isRinkebyNetwork, zeroAddress } from './utils';
 
 import AccountBalanceWalletOutlinedIcon from '@material-ui/icons/AccountBalanceWalletOutlined';
 import Button from '@material-ui/core/Button';
@@ -33,8 +33,8 @@ import {
   getIsOwner,
   setName,
   getName,
-  getIsRopsten,
-  setIsRopsten,
+  getIsRinkeby,
+  setIsRinkeby,
   getHasMetaMask,
   setHasMetaMask,
 } from './store/accountSlice';
@@ -57,7 +57,7 @@ function App() {
   const decimals = useSelector(getDecimals);
   const latestBlockNum = useSelector(getLatestBlockNum);
   const isOwner = useSelector(getIsOwner);
-  const isRopsten = useSelector(getIsRopsten);
+  const isRinkeby = useSelector(getIsRinkeby);
   const hasMetaMask = useSelector(getHasMetaMask);
 
   const [initialized, setInitialized] = useState(false);
@@ -65,10 +65,10 @@ function App() {
 
   async function init() {
     const hasMM = isMetaMaskInstalled();
-    const onCorrectNetwork = await isRopstenNetwork();
+    const onCorrectNetwork = await isRinkebyNetwork();
 
     dispatch(setHasMetaMask(hasMM));
-    dispatch(setIsRopsten(onCorrectNetwork));
+    dispatch(setIsRinkeby(onCorrectNetwork));
 
     if (hasMM && onCorrectNetwork) {
       let Contract = TruffleContract(CHENDollas);
@@ -112,7 +112,7 @@ function App() {
       return;
     }
 
-    if (!hasMetaMask || !isRopsten) {
+    if (!hasMetaMask || !isRinkeby) {
       return;
     }
 
@@ -164,7 +164,7 @@ function App() {
       web3.eth.clearSubscriptions();
     };
   // eslint-disable-next-line
-  }, [initialized, isRopsten, hasMetaMask]);
+  }, [initialized, isRinkeby, hasMetaMask]);
 
   async function getAccount() {
     const ethereum = window.ethereum;
@@ -252,7 +252,7 @@ function App() {
             Please wait a few seconds to warm up the printer...your transaction hash is{' '}
             <Link
               color="textPrimary"
-              href={`https://ropsten.etherscan.io/tx/${hash}`}
+              href={`https://rinkeby.etherscan.io/tx/${hash}`}
               target="_blank">
               {hash}
             </Link>
@@ -299,7 +299,7 @@ function App() {
             Please wait a few seconds to process...your transaction hash is{' '}
             <Link
               color="textPrimary"
-              href={`https://ropsten.etherscan.io/tx/${hash}`}
+              href={`https://rinkeby.etherscan.io/tx/${hash}`}
               target="_blank">
               {hash}
             </Link>
@@ -349,7 +349,7 @@ function App() {
             Please wait a few seconds to process...your transaction hash is{' '}
             <Link
               color="textPrimary"
-              href={`https://ropsten.etherscan.io/tx/${hash}`}
+              href={`https://rinkeby.etherscan.io/tx/${hash}`}
               target="_blank">
               {hash}
             </Link>
@@ -403,7 +403,7 @@ function App() {
             Please wait a few seconds to process...your transaction hash is{' '}
             <Link
               color="textPrimary"
-              href={`https://ropsten.etherscan.io/tx/${hash}`}
+              href={`https://rinkeby.etherscan.io/tx/${hash}`}
               target="_blank">
               {hash}
             </Link>

@@ -3,13 +3,13 @@ export function isMetaMaskInstalled() {
   return Boolean(ethereum && ethereum.isMetaMask);
 }
 
-export async function isRopstenNetwork() {
+export async function isRinkebyNetwork() {
   if (!isMetaMaskInstalled()) {
     return false;
   }
 
   const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-  return chainId === '0x3';
+  return chainId === '0x4';
 }
 
 export const ACTIONS = {

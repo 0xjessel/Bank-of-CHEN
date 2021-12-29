@@ -2,7 +2,7 @@ import MetaMaskOnboarding from '@metamask/onboarding';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { isNUXDialogOpen } from '../store/NUXDialogSlice';
-import { getIsRopsten, getHasMetaMask } from '../store/accountSlice';
+import { getIsRinkeby, getHasMetaMask } from '../store/accountSlice';
 import { isChrome, isMobile } from "react-device-detect";
 
 import Box from '@material-ui/core/Box';
@@ -20,7 +20,7 @@ import network from '../img/network.png';
 
 export default function NUXDialog(props) {
   const open = useSelector(isNUXDialogOpen);
-  const isRopsten = useSelector(getIsRopsten);
+  const isRinkeby = useSelector(getIsRinkeby);
   const hasMetaMask = useSelector(getHasMetaMask);
   const onboarding = React.useRef();
 
@@ -96,23 +96,23 @@ export default function NUXDialog(props) {
               Get some{' '}
               <Link
                 color="secondary"
-                href="https://faucet.ropsten.be/"
+                href="https://faucets.chain.link/rinkeby"
                 target="_blank">
-                Ropsten ETH
+                Rinkeby ETH
               </Link>
               {' '}to pay for gas fees
             </Typography>
           </li>
           <li>
             <Typography gutterBottom>
-              Switch to "Ropsten Test Network" {isRopsten
+              Switch to "Rinkeby Test Network" {isRinkeby
                 ? <CheckCircleIcon className="status_icon" />
                 : <CancelIcon className="status_icon" />
               }
             </Typography>
             <img
               src={network}
-              alt="switch network to Ropsten"
+              alt="switch network to Rinkeby"
               width="50%"
             />
           </li>

@@ -7,7 +7,7 @@ export const accountSlice = createSlice({
     decimals: 18,
     hasMetaMask: false,
     isOwner: false,
-    isRopsten: false,
+    isRinkeby: false,
     latestBlockNum: 0,
     name: null,
   },
@@ -27,8 +27,8 @@ export const accountSlice = createSlice({
     setIsOwner: (state, action) => {
       state.isOwner = action.payload;
     },
-    setIsRopsten: (state, action) => {
-      state.isRopsten = action.payload;
+    setIsRinkeby: (state, action) => {
+      state.isRinkeby = action.payload;
     },
     setName: (state, action) => {
       state.name = action.payload;
@@ -42,7 +42,7 @@ export const {
   setHasMetaMask,
   setLatestBlockNum,
   setIsOwner,
-  setIsRopsten,
+  setIsRinkeby,
   setName,
 } = accountSlice.actions;
 
@@ -51,7 +51,7 @@ export const getAddress = state => state.account.address;
 export const getHasMetaMask = state => state.account.hasMetaMask;
 export const getLatestBlockNum = state => state.account.latestBlockNum;
 export const getIsOwner = state => state.account.isOwner;
-export const getIsRopsten = state => state.account.isRopsten;
+export const getIsRinkeby = state => state.account.isRinkeby;
 export const getName = state => state.account.name;
 
 export default accountSlice.reducer;
