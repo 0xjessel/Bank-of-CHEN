@@ -66,7 +66,7 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
-.add_token.MuiAvatar-root, .get_ropsten.MuiAvatar-root {
+.add_token.MuiAvatar-root, .get_rinkeby.MuiAvatar-root {
   cursor: pointer;
   border: 1px solid gray;
   display: block;

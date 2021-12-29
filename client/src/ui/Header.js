@@ -40,12 +40,12 @@ export default function Header(props) {
       </li>
       <li>
         <Link
-          href="https://faucet.ropsten.be/"
+          href="https://faucets.chain.link/rinkeby"
           target="_blank">
-          <Tooltip title="Get Ropsten ETH">
+          <Tooltip title="Get Rinkeby ETH">
             <Avatar
-              className="get_ropsten"
-              alt="Get Ropsten ETH"
+              className="get_rinkeby"
+              alt="Get Rinkeby ETH"
               src="/eth-logo.png"
             />
           </Tooltip>
