@@ -9,8 +9,8 @@ Bank of 陈CHEN is a dapp that provides various controls for managing the bigges
 I built this to learn about Ethereum blockchain, ERC20 tokens, and web3.  Also secretly hoping this coin will moon one day 🚀.  
 
 ## Instructions
-1. Download the [Metamask Chrome extension](https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn).  Where it says "Ethereum Mainnet", click on it and toggle to "Ropsten Test Network"
-2. Find a [Ropsten faucet](https://faucet.ropsten.be/) and get some Ropsten ETH to pay for gas fees
+1. Download the [Metamask Chrome extension](https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn).  Where it says "Ethereum Mainnet", click on it and toggle to "Rinkeby Test Network"
+2. Find a [Rinkeby faucet](https://faucets.chain.link/rinkeby) and get some Rinkeby ETH to pay for gas fees
 3. Go to https://bankofchen.vercel.app/
 4. Follow instructions and click "Connect Wallet" to get started
 
@@ -19,9 +19,9 @@ I built this to learn about Ethereum blockchain, ERC20 tokens, and web3.  Also s
 
 ## Technical Details
 
-Currently, it is only deployed to the Ropsten testnet.  I've only tested this on Chrome and with the Metamask extension, other setups likely will not work.  Built with Truffle, Material UI, and React.js
+Currently, it is only deployed to the Rinkeby testnet.  I've only tested this on Chrome and with the Metamask extension, other setups likely will not work.  Built with Truffle, Material UI, and React.js
 
-To build the blockchain contracts, `npm run install` in `blockchain/`, `truffle develop` and then `migrate` to set up a local testnet.  To deploy onto the blockchain, `truffle deploy --network ropsten`.
+To build the blockchain contracts, `npm run install` in `blockchain/`, `truffle develop` and then `migrate` to set up a local testnet.  To deploy onto the blockchain, `truffle deploy --network rinkeby`.
 
 To build the React app, `yarn install` in `client/` and then `yarn run start`.  You'll also need to `cp blockchain/build/contracts/CHENDollas.json client/src/build/contracts/CHENDollas.json` to allow `TruffleContract` to access the contract's ABI.  
 
