@@ -88,22 +88,6 @@ function App() {
         provider: Web3.givenProvider,
         ensAddress: getEnsAddress('1'),
       });
-    } else if (hasMM && !onCorrectNetwork) {
-      const ethereum = window.ethereum;
-      if (ethereum === undefined) {
-        console.error('window.ethereum is undefined!');
-        dispatch(showNUX());
-      }
-
-      try {
-        await ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x4' }],
-        });
-      } catch (e) {
-        console.error(e);
-        dispatch(showNUX());
-      }
     } else {
       dispatch(showNUX());
     }
